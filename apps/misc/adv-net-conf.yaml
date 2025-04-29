@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: adv-net-conf
+  namespace: kube-system
 data:
   configure-network.sh: |-
     #!/bin/sh
@@ -42,6 +43,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: adv-net-config
+  namespace: kube-system
 spec:
   selector:
     matchLabels:
