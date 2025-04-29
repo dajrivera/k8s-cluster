@@ -7,17 +7,22 @@ data:
     #!/bin/sh
 
     # install necessary tools
-    apk add --no-cache iproute2 >/dev/null || echo iproute2 install failed
+    apk add --no-cache bash iproute2 >/dev/null || echo iproute2 install failed
+    
+    DOLLAR='$'
+
+    cat <<EOF >>/tmp/net-config.sh
+    #!/bin/bash
 
     ##
     # add and configure veth interfaces
     ##
-    interfaces=('net0','ceph0')
+    interfaces=('net0' 'ceph0')
 
-    for interface in "${interfaces[@]}"; do
-      ip link add name $interface type veth peer name ${interface}-port || echo failed to add veth interface $interface
-      ip link set ${interface}-port up master br-ext || echo failed to add ${interface}-port interface to bridge
-      ip link set ${interface} up || echo failed to bring up $interface interface
+    for interface in "${DOLLAR}{interfaces[@]}"; do
+      ip link add name ${DOLLAR}interface type veth peer name ${DOLLAR}{interface}-port || echo failed to add veth interface ${DOLLAR}interface
+      ip link set ${DOLLAR}{interface}-port up master br-ext || echo failed to add ${DOLLAR}{interface}-port interface to bridge
+      ip link set ${DOLLAR}interface up || echo failed to bring up ${DOLLAR}interface interface
     done
 
     # configure vlans on interfaces
@@ -28,6 +33,10 @@ data:
     bridge vlan add vid 4094 dev net0-port pvid untagged || echo failed to assign vlans to net0-port
 
     echo Network configuration setup complete.
+    EOF
+
+    chmod +x /tmp/net-config.sh
+    /tmp/net-config.sh
 ---
 apiVersion: apps/v1
 kind: DaemonSet
