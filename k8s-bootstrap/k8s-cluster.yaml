@@ -1,0 +1,242 @@
+kind: Cluster
+name: k8s-homelab-cluster
+kubernetes:
+  version: v1.32.4
+talos:
+  version: v1.9.5
+features:
+  diskEncryption: true
+  enableWorkloadProxy: true
+  useEmbeddedDiscoveryService: true
+patches:
+  - idOverride: 200-k8s-homelab-cluster
+    inline:
+      cluster:
+        allowSchedulingOnControlPlanes: true
+        apiServer:
+          admissionControl:
+            - name: PodSecurity
+              configuration:
+                exemptions:
+                  namespaces:
+                    - rook-ceph
+          extraArgs:
+            feature-gates: UserNamespacesSupport=true,UserNamespacesPodSecurityStandards=true
+        inlineManifests:
+          - name: cilium-install
+            contents: |-
+              apiVersion: rbac.authorization.k8s.io/v1
+              kind: ClusterRoleBinding
+              metadata:
+                name: cilium-install
+              roleRef:
+                apiGroup: rbac.authorization.k8s.io
+                kind: ClusterRole
+                name: cluster-admin
+              subjects:
+              - kind: ServiceAccount
+                name: cilium-install
+                namespace: kube-system
+              ---
+              apiVersion: v1
+              kind: ServiceAccount
+              metadata:
+                name: cilium-install
+                namespace: kube-system
+              ---
+              apiVersion: batch/v1
+              kind: Job
+              metadata:
+                name: cilium-install
+                namespace: kube-system
+              spec:
+                backoffLimit: 10
+                template:
+                  metadata:
+                    labels:
+                      app: cilium-install
+                  spec:
+                    restartPolicy: OnFailure
+                    tolerations:
+                      - operator: Exists
+                      - effect: NoSchedule
+                        operator: Exists
+                      - effect: NoExecute
+                        operator: Exists
+                      - effect: PreferNoSchedule
+                        operator: Exists
+                      - key: node-role.kubernetes.io/control-plane
+                        operator: Exists
+                        effect: NoSchedule
+                      - key: node-role.kubernetes.io/control-plane
+                        operator: Exists
+                        effect: NoExecute
+                      - key: node-role.kubernetes.io/control-plane
+                        operator: Exists
+                        effect: PreferNoSchedule
+                    affinity:
+                      nodeAffinity:
+                        requiredDuringSchedulingIgnoredDuringExecution:
+                          nodeSelectorTerms:
+                            - matchExpressions:
+                                - key: node-role.kubernetes.io/control-plane
+                                  operator: Exists
+                    serviceAccount: cilium-install
+                    serviceAccountName: cilium-install
+                    hostNetwork: true
+                    containers:
+                    - name: cilium-install
+                      image: docker.io/alpine/helm:3.17.2
+                      env:
+                      - name: KUBERNETES_SERVICE_HOST
+                        valueFrom:
+                          fieldRef:
+                            apiVersion: v1
+                            fieldPath: status.podIP
+                      - name: KUBERNETES_SERVICE_PORT
+                        value: "6443"
+                      command: ["/bin/sh", "-c"]
+                      args:
+                        - |-
+                          helm repo add cilium https://helm.cilium.io/
+                          helm repo update
+                          helm upgrade --install cilium cilium/cilium \
+                          --version=1.17.3 \
+                          --set=cluster.name=k8s-homelab-cluster \
+                          --set=cluster.id=1 \
+                          --set=ipam.mode=kubernetes \
+                          --set=kubeProxyReplacement=true \
+                          --set=securityContext.capabilities.ciliumAgent={CHOWN,KILL,NET_ADMIN,NET_RAW,IPC_LOCK,SYS_ADMIN,SYS_RESOURCE,DAC_OVERRIDE,FOWNER,SETGID,SETUID} \
+                          --set=securityContext.capabilities.cleanCiliumState={NET_ADMIN,SYS_ADMIN,SYS_RESOURCE} \
+                          --set=cgroup.autoMount.enabled=false \
+                          --set=cgroup.hostRoot=/sys/fs/cgroup \
+                          --set=k8sServiceHost=localhost \
+                          --set=k8sServicePort=7445 \
+                          --set=cni.exclusive=false \
+                          --set=l2announcements.enabled=true \
+                          --set=operator.replicas=1 \
+                          --set=endpointRoutes.enabled=true \
+                          --set=bpf.datapathMode=netkit \
+                          --set=bpf.masquerade=true \
+                          --set=gatewayAPI.enabled=true \
+                          --set=envoy.securityContext.capabilities.keepCapNetBindService=true \
+                          --set=envoy.securityContext.capabilities.envoy={NET_ADMIN,SYS_ADMIN,NET_BIND_SERVICE} \
+                          --set=bpf.hostLegacyRouting=true \
+                          --set=devices=br-ext
+          - name: adv-net-conf
+            contents: |-
+              apiVersion: v1
+              kind: ConfigMap
+              metadata:
+                name: adv-net-conf
+              data:
+                configure-network.sh: |-
+                  #!/bin/sh
+
+                  # install necessary tools
+                  apk add --no-cache iproute2 >/dev/null || echo iproute2 install failed
+
+                  ##
+                  # add and configure veth interfaces
+                  ##
+                  interfaces=('net0','ceph0')
+
+                  for interface in "${interfaces[@]}"; do
+                    ip link add name $interface type veth peer name ${interface}-port || echo failed to add veth interface $interface
+                    ip link set ${interface}-port up master br-ext || echo failed to add ${interface}-port interface to bridge
+                    ip link set ${interface} up || echo failed to bring up $interface interface
+                  done
+
+                  # configure vlans on interfaces
+                  bridge vlan add vid 2-4094 dev br-ext self || echo failed to assign vlans to br-ext
+                  bridge vlan add vid 2-4094 dev bond0 || echo failed to assign vlans to bond0
+
+                  bridge vlan add vid 3000 dev ceph0-port pvid untagged || echo failed to assign vlans to ceph0-port
+                  bridge vlan add vid 4094 dev net0-port pvid untagged || echo failed to assign vlans to net0-port
+
+                  echo Network configuration setup complete.
+              ---
+              apiVersion: apps/v1
+              kind: DaemonSet
+              metadata:
+                name: adv-net-config
+              spec:
+                selector:
+                  matchLabels:
+                    name: adv-net-config
+                template:
+                  metadata:
+                    labels:
+                      name: adv-net-config
+                  spec:
+                    hostNetwork: true
+                    containers:
+                      - name: adv-net-config-sleep
+                        image: docker.io/library/alpine:3.21.3
+                        securityContext:
+                          privileged: false
+                          runAsNonRoot: true
+                          runAsUser: 65534
+                          runAsGroup: 65534
+                          allowPrivilegeEscalation: false
+                          readOnlyRootFilesystem: true
+                          capabilities:
+                            drop:
+                              - ALL
+                        command: ["sleep", "infinity"]
+                    initContainers:
+                      - name: adv-net-config
+                        image: docker.io/library/alpine:3.21.3
+                        securityContext:
+                          capabilities:
+                            drop:
+                              - ALL
+                            add:
+                            - NET_ADMIN
+                        command: ["/bin/sh", "-c"]
+                        args:
+                          - >-
+                            /tmp/configure-network.sh ||
+                            sleep infinity
+                        volumeMounts:
+                        - name: net-config
+                          mountPath: /tmp/configure-network.sh
+                          subPath: configure-network.sh
+                          readOnly: true
+                    volumes:
+                    - name: net-config
+                      configMap:
+                        name: adv-net-conf
+                        defaultMode: 0544
+                        items:
+                        - key: configure-network.sh
+                          path: configure-network.sh
+        network:
+          cni:
+            name: none
+        proxy:
+          disabled: true
+      machine:
+        kubelet:
+          extraArgs:
+            max-pods: "250"
+          extraConfig:
+            featureGates:
+              UserNamespacesPodSecurityStandards: true
+              UserNamespacesSupport: true
+        sysctls:
+          user.max_user_namespaces: "11255"
+---
+kind: ControlPlane
+machineClass:
+  name: home-cluster
+  size: 1
+patches:
+  - idOverride: 400-talos-default-control-planes
+    inline:
+      machine:
+        install:
+          extraKernelArgs:
+            - ipv6.disable=1
+---
+kind: Workers

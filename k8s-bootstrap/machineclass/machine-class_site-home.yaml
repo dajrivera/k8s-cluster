@@ -1,0 +1,7 @@
+metadata:
+    namespace: default
+    type: MachineClasses.omni.sidero.dev
+    id: home-cluster
+spec:
+    matchlabels:
+        - vnetgaming.com/cluster-site=home
