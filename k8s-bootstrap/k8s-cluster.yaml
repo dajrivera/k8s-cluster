@@ -3,7 +3,7 @@ name: k8s-homelab-cluster
 kubernetes:
   version: v1.32.4
 talos:
-  version: v1.9.5
+  version: v1.9.6
 features:
   diskEncryption: true
   enableWorkloadProxy: true
