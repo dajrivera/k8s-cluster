@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: host-network-conf
+  namespace: kube-system
+data:
+  configure-network.sh: |-
+    #!/bin/bash
+
+    ##
+    # add and configure veth interfaces
+    ##
+    interfaces=('net0' 'net1' 'ceph0')
+
+    for interface in "${interfaces[@]}"; do
+      ip link add name $interface type veth peer name ${interface}-port || echo failed to add veth interface $interface
+      ip link set ${interface}-port up master br-ext || echo failed to add ${interface}-port interface to bridge
+      ip link set $interface up || echo failed to bring up $interface interface
+    done
+
+    # configure vlans on interfaces
+    bridge vlan add vid 2-4094 dev br-ext self || echo failed to assign vlans to br-ext
+    bridge vlan add vid 2-4094 dev bond0 || echo failed to assign vlans to bond0
+
+    bridge vlan add vid 3000 dev ceph0-port pvid untagged || echo failed to assign vlans to ceph0-port
+    bridge vlan add vid 4094 dev net0-port pvid untagged || echo failed to assign vlans to net0-port
+
+    echo Network configuration setup complete.

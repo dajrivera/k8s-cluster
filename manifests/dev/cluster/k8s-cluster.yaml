@@ -1,5 +1,5 @@
 kind: Cluster
-name: k8s-homelab-cluster
+name: k8s-homelab
 kubernetes:
   version: v1.32.4
 talos:
@@ -9,7 +9,7 @@ features:
   enableWorkloadProxy: true
   useEmbeddedDiscoveryService: true
 patches:
-  - idOverride: 200-k8s-homelab-cluster
+  - name: clusterconfig
     inline:
       cluster:
         allowSchedulingOnControlPlanes: true
@@ -22,9 +22,6 @@ patches:
                     - rook-ceph
           extraArgs:
             feature-gates: UserNamespacesSupport=true,UserNamespacesPodSecurityStandards=true
-        extraManifests:
-          - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/apps/misc/adv-net-conf.yaml
-          - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/apps/cilium/cilium.yaml
         network:
           cni:
             name: none
@@ -38,15 +35,23 @@ patches:
             featureGates:
               UserNamespacesPodSecurityStandards: true
               UserNamespacesSupport: true
+        features:
+          hostDNS:
+            enabled: true
+            forwardKubeDNSToHost: false              
         sysctls:
           user.max_user_namespaces: "11255"
+  - name: extramanifests
+    file: manifests/dev/cluster/bootstrap/k8s-cluster-extramanifests.yaml
+  - name: extramanifests-cilium
+    file: manifests/dev/cluster/bootstrap/k8s-cluster-extramanifests-cilium.yaml    
 ---
 kind: ControlPlane
 machineClass:
-  name: home-cluster
+  name: homelab
   size: 1
 patches:
-  - idOverride: 400-talos-default-control-planes
+  - name: machinepatch
     inline:
       machine:
         install:

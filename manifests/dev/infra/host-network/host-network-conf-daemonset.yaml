@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: host-network-conf
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      name: host-network-conf
+  template:
+    metadata:
+      labels:
+        name: host-network-conf
+    spec:
+      hostNetwork: true
+      containers:
+        - name: host-network-conf-sleep
+          image: ghcr.io/dajrivera/alpine:3.21.3-bash-iproute
+          securityContext:
+            privileged: false
+            runAsNonRoot: true
+            runAsUser: 65534
+            runAsGroup: 65534
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          command: ["sleep", "infinity"]
+      initContainers:
+        - name: host-network-conf
+          image: ghcr.io/dajrivera/alpine:3.21.3-bash-iproute
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+              add:
+              - NET_ADMIN
+          command: ["/bin/bash", "-c"]
+          args:
+            - >-
+              /tmp/configure-network.sh ||
+              sleep infinity
+          volumeMounts:
+          - name: net-config
+            mountPath: /tmp/configure-network.sh
+            subPath: configure-network.sh
+            readOnly: true
+      volumes:
+      - name: net-config
+        configMap:
+          name: host-network-conf
+          defaultMode: 0544
+          items:
+          - key: configure-network.sh
+            path: configure-network.sh
