@@ -47,6 +47,8 @@ patches:
     file: manifests/dev/cluster/bootstrap/k8s-cluster-extramanifests-multus.yaml
   - name: extramanifests-cilium
     file: manifests/dev/cluster/bootstrap/k8s-cluster-extramanifests-cilium.yaml
+  - name: extramanifests-argocd
+    file: manifests/dev/cluster/bootstrap/k8s-cluster-extramanifests-argocd.yaml
 ---
 kind: ControlPlane
 machineClass:

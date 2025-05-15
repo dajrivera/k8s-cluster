@@ -1,0 +1,5 @@
+apiVersion: builtin
+kind: HelmChartInflationGenerator
+metadata:
+  name: argo-cd
+valuesFile: values-dev.yaml
