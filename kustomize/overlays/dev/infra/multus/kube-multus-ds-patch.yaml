@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: kube-multus-ds
+spec:
+  selector:
+    matchLabels:
+      name: multus
+  template:
+    spec:
+      priorityClassName: system-node-critical
+      containers:
+        - name: kube-multus
+          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.0-thick
+          resources:
+            $patch: delete # prevent OOM kill on startup
+          lifecycle:
+            preStop:
+              exec:
+                command: # workaround, see multus-cni#1391
+                  - "/bin/sh"
+                  - "-c"
+                  - "chattr -f +i /host/etc/cni/net.d/00-multus.conf || exit 0"
+          volumeMounts:
+            - name: multus-cni-config
+              mountPath: /tmp/multus
+      initContainers:
+        - name: remove-multusconf-persistence # workaround, see multus-cni#1391
+          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.0-thick
+          command:
+            - "/bin/sh"
+            - "-c"
+            - "chattr -f -i /host/etc/cni/net.d/00-multus.conf || exit 0"
+          resources:
+            requests:
+              cpu: "10m"
+              memory: "15Mi"
+          securityContext:
+            privileged: true
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - name: cni
+              mountPath: /host/etc/cni/net.d
+        - name: install-multus-binary
+          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.0-thick
+          command:
+            - "cp"
+            - "--force"
+            - "/usr/src/multus-cni/bin/multus-shim"
+            - "/host/opt/cni/bin/multus-shim"
+        - name: install-cni
+          image: ghcr.io/siderolabs/install-cni:v1.9.0  # adapt to your talos major version
+          command:
+          - /install-cni.sh          
+          securityContext:
+            privileged: true
+          volumeMounts:
+          - mountPath: /host/opt/cni/bin
+            mountPropagation: Bidirectional
+            name: cnibin
+      volumes:
+        - name: multus-cni-config
+          configMap:
+            name: multus-cni-config
+            items:
+            - key: 00-multus.conf
+              path: 00-multus.conf
+        - name: host-run-netns
+          hostPath:
+            path: /var/run/netns/ # talos compatibility
