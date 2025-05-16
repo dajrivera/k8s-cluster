@@ -1,0 +1,7 @@
+apiVersion: builtin
+kind: HelmChartInflationGenerator
+metadata:
+  name: cert-manager
+valuesFile: ../../../../base/apps/cert-manager/values.yaml
+additionalValuesFiles:
+ - values-dev.yaml
