@@ -1,0 +1,44 @@
+global:
+  env: dev
+  helmDefault: false
+  valuesFile: values.yaml
+  spec:
+    project: default
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: default
+    source:
+      repoURL: https://github.com/dajrivera/k8s-cluster.git
+      targetRevision: HEAD
+
+argocdApplications:
+  hostNetwork:
+    disableAutomated: false
+    disable: false
+    name: host-network
+    namespace: kube-system
+    appCategory: infra
+  multus:
+    disableAutomated: false
+    disable: false
+    name: multus
+    namespace: kube-system
+    appCategory: infra
+  cilium:
+    disableAutomated: false
+    disable: false
+    name: cilium
+    namespace: kube-system
+    appCategory: infra
+  argocdApps:
+    disableAutomated: false
+    disable: false
+    name: argocd-apps
+    namespace: argocd
+    appCategory: apps
+  certManager:
+    disableAutomated: false
+    disable: false
+    name: cert-manager
+    namespace: cert-manager
+    appCategory: apps

@@ -1,0 +1,21 @@
+global:
+  env: default
+  helmDefault: false
+  valuesFile: values.yaml
+  spec:
+    project: default
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: default
+    source:
+      repoURL: https://github.com/owner/repo.git
+      targetRevision: HEAD
+
+#argocdApplications:
+#  cilium:
+#    disableAutomated: false
+#    disable: false
+#    name: cilium
+#    namespace: kube-system
+#    targetRevision: HEAD
+#    appCategory: infra

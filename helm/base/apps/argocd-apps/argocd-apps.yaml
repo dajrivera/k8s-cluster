@@ -1,0 +1,10 @@
+apiVersion: builtin
+kind: HelmChartInflationGenerator
+metadata:
+  name: argocd-apps
+name: argocd-apps
+chartHome: charts
+releaseName: argocd-apps
+namespace: argocd
+includeCRDs: true
+skipHooks: false

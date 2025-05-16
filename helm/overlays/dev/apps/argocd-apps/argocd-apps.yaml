@@ -1,0 +1,6 @@
+apiVersion: builtin
+kind: HelmChartInflationGenerator
+metadata:
+  name: argocd-apps
+chartHome: ../../../../../helm/base/apps/argocd-apps/chart
+valuesFile: values-dev.yaml
