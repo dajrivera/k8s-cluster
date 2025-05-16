@@ -51,6 +51,8 @@ patches:
     file: manifests/dev/cluster/bootstrap/k8s-cluster-extramanifests-cilium.yaml
   - name: extramanifests-argocd
     file: manifests/dev/cluster/bootstrap/k8s-cluster-extramanifests-argocd.yaml
+  - name: extramanifests-argocd-projects
+    file: manifests/dev/cluster/bootstrap/k8s-cluster-extramanifests-argocd-projects.yaml
   - name: extramanifests-argocd-apps
     file: manifests/dev/cluster/bootstrap/k8s-cluster-extramanifests-argocd-apps.yaml    
 ---
