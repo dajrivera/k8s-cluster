@@ -66,6 +66,6 @@ patches:
       machine:
         install:
           extraKernelArgs:
-            - ipv6.disable=1
+            - ipv6.disable=0
 ---
 kind: Workers

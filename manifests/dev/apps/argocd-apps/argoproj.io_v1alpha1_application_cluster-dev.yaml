@@ -3,6 +3,11 @@ kind: Application
 metadata:
   name: cluster-dev
   namespace: argocd
+# operation:
+#   sync:
+#     syncStrategy:
+#       apply:
+#         force: true
 spec:
   destination:
     namespace: kube-system
@@ -19,9 +24,11 @@ spec:
       allowEmpty: false
       prune: true
       selfHeal: true
-    retry:
-      limit: 2
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 3m0s
+    syncOptions:
+      - Replace=true
+    # retry:
+    #   limit: 2
+    #   backoff:
+    #     duration: 5s
+    #     factor: 2
+    #     maxDuration: 3m0s
