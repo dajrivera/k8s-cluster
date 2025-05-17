@@ -11,7 +11,15 @@ spec:
   source:
     repoURL:  {{ $.Values.global.spec.source.repoURL }}
     targetRevision: {{ default $.Values.global.spec.source.targetRevision .targetRevision }}
+  {{- if hasKey . "appCategory" }}
     path: manifests/{{ $.Values.global.env }}/{{ .appCategory }}/{{ .name }}
+  {{- else }}
+    path: manifests/{{ $.Values.global.env }}/{{ .name }}
+  {{- end }}
+  {{- if not (empty .directory) }}
+    directory:
+  {{- .directory | toYaml | nindent 6}}
+  {{- end }}
   destination:
     namespace: {{ default $.Values.global.spec.destination.namespace .namespace }}
     server: {{ $.Values.global.spec.destination.server }}

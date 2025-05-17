@@ -12,6 +12,16 @@ global:
       targetRevision: HEAD
 
 argocdApplications:
+  cluster:
+    disableAutomated: false
+    disable: false
+    name: cluster
+    namespace: kube-system
+    directory:
+#      recurse: false
+#      exclude: "{k8s-cluster.yaml}"
+      include: "omni-cluster-sync-job.yaml"
+#    appCategory: infra
   hostNetwork:
     disableAutomated: false
     disable: false
