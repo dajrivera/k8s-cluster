@@ -1,0 +1,81 @@
+apiVersion: batch/v1
+# apiVersion: v1
+kind: Job
+metadata:
+#  generateName: omnictl-sync-job-
+  name: omnictl-sync-job
+  namespace: kube-system
+  annotations:
+    argocd.argoproj.io/sync-options: Force=true,Replace=true
+spec:
+  backoffLimit: 1
+  completions: 1
+  template:
+    spec:
+      securityContext:
+        fsGroup: 65534
+        fsGroupChangePolicy: "Always"      
+      initContainers:
+      - name: clone-source-repo
+        image: docker.io/alpine/git:v2.47.2
+        env:
+        - name: HOME
+          value: /omni
+        securityContext:
+          privileged: false
+          runAsNonRoot: true
+          runAsUser: 65534
+          runAsGroup: 65534
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+        workingDir: /omni
+        command: ["/bin/sh","-c"]
+        args:
+          - >-
+            git clone -n --depth=1 --filter=tree:0 https://github.com/dajrivera/k8s-cluster.git repo
+            && cd repo
+            && git sparse-checkout set --no-cone /manifests/dev/cluster
+            && git checkout
+        volumeMounts:
+        - mountPath: /omni
+          name: omni
+      containers:
+      - name: cluster-template-sync
+        image: ghcr.io/dajrivera/omnictl:v0.49.1
+        env:
+        - name: OMNI_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: omni-api-key
+              key: omniEndpoint
+        - name: OMNI_SERVICE_ACCOUNT_KEY
+          valueFrom:
+            secretKeyRef:
+              name: omni-api-key
+              key: omniServiceAccountKey
+        securityContext:
+          privileged: false
+          runAsNonRoot: true
+          runAsUser: 65534
+          runAsGroup: 65534
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+        command: ["/bin/sh","-c"]
+        args:
+          - >-
+            tree .
+            && cd repo/
+            && omnictl cluster template validate -f manifests/dev/cluster/k8s-cluster.yaml
+            && omnictl cluster template sync -f manifests/dev/cluster/k8s-cluster.yaml
+        volumeMounts:
+        - mountPath: /omni
+          name: omni
+      restartPolicy: Never
+      volumes:
+      - name: omni
+        emptyDir:
+          sizeLimit: 500Mi
