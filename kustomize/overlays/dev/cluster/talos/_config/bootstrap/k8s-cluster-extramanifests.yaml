@@ -1,0 +1,4 @@
+cluster:
+  extraManifests:
+    - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/infra/host-network/host-network-conf-configmap.yaml
+    - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/infra/host-network/host-network-conf-daemonset.yaml

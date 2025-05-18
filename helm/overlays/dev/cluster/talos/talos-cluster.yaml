@@ -1,0 +1,6 @@
+apiVersion: builtin
+kind: HelmChartInflationGenerator
+metadata:
+  name: talos-cluster
+chartHome: ../../../../../helm/base/cluster/talos/charts
+#valuesFile: values-dev.yaml

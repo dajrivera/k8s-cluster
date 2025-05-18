@@ -12,16 +12,16 @@ global:
       targetRevision: HEAD
 
 argocdApplications:
-  cluster:
+  talos:
     disableAutomated: false
     disable: false
-    name: cluster
-    namespace: kube-system
+    name: talos
+    namespace: omni-system
     directory:
-#      recurse: false
-#      exclude: "{k8s-cluster.yaml}"
-      include: "omni-cluster-sync-job.yaml"
-#    appCategory: infra
+      recurse: false
+      exclude: "{k8s-cluster.yaml,bootstrap/*}"
+      # include: "omni-cluster-sync-job.yaml"
+    appCategory: cluster
   hostNetwork:
     disableAutomated: false
     disable: false

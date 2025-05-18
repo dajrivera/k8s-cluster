@@ -1,0 +1,3 @@
+cluster:
+  extraManifests:
+    - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/apps/argocd-projects/argocd-project-default.yaml

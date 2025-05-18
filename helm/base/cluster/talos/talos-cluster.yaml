@@ -1,0 +1,10 @@
+apiVersion: builtin
+kind: HelmChartInflationGenerator
+metadata:
+  name: talos-cluster
+name: talos-cluster
+chartHome: charts
+releaseName: talos-cluster
+namespace: omni-system
+includeCRDs: true
+skipHooks: false

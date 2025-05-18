@@ -1,0 +1,11 @@
+apiVersion: customFunction
+kind: ClusterConfigHashGenerator
+metadata:
+  name: talos-cluster-config-generator
+  annotations:
+    config.kubernetes.io/function: |
+      exec: 
+        path: ./plugins/generate-cluster-config.sh
+spec:
+  configPath: _config
+  outputPath: ../../../../../manifests/dev/cluster/talos

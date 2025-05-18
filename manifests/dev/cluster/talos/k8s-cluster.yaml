@@ -44,17 +44,17 @@ patches:
         sysctls:
           user.max_user_namespaces: "11255"
   - name: extramanifests
-    file: manifests/dev/cluster/bootstrap/k8s-cluster-extramanifests.yaml
+    file: manifests/dev/cluster/talos/bootstrap/k8s-cluster-extramanifests.yaml
   - name: extramanifests-multus
-    file: manifests/dev/cluster/bootstrap/k8s-cluster-extramanifests-multus.yaml
+    file: manifests/dev/cluster/talos/bootstrap/k8s-cluster-extramanifests-multus.yaml
   - name: extramanifests-cilium
-    file: manifests/dev/cluster/bootstrap/k8s-cluster-extramanifests-cilium.yaml
+    file: manifests/dev/cluster/talos/bootstrap/k8s-cluster-extramanifests-cilium.yaml
   - name: extramanifests-argocd
-    file: manifests/dev/cluster/bootstrap/k8s-cluster-extramanifests-argocd.yaml
+    file: manifests/dev/cluster/talos/bootstrap/k8s-cluster-extramanifests-argocd.yaml
   - name: extramanifests-argocd-projects
-    file: manifests/dev/cluster/bootstrap/k8s-cluster-extramanifests-argocd-projects.yaml
+    file: manifests/dev/cluster/talos/bootstrap/k8s-cluster-extramanifests-argocd-projects.yaml
   - name: extramanifests-argocd-apps
-    file: manifests/dev/cluster/bootstrap/k8s-cluster-extramanifests-argocd-apps.yaml    
+    file: manifests/dev/cluster/talos/bootstrap/k8s-cluster-extramanifests-argocd-apps.yaml    
 ---
 kind: ControlPlane
 machineClass:
@@ -66,6 +66,6 @@ patches:
       machine:
         install:
           extraKernelArgs:
-            - ipv6.disable=0
+            - ipv6.disable=1
 ---
 kind: Workers

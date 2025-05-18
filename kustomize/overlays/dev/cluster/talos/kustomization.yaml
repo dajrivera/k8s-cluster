@@ -1,0 +1,7 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../../../base/cluster/talos
+generators:
+  - ../../../../../helm/overlays/dev/cluster/talos
+  - generate-cluster-config.yaml

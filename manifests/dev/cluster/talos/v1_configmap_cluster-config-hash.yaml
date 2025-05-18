@@ -1,0 +1,8 @@
+apiVersion: v1
+data:
+  clusterConfigHash: 03c0245476e31038f7d546c4782f243438874da2
+  clusterConfigPath: kustomize/overlays/dev/cluster/talos/_config
+kind: ConfigMap
+metadata:
+  name: cluster-config-hash
+  namespace: omni-system

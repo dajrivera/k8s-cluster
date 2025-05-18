@@ -1,23 +1,15 @@
-# apiVersion: apps/v1
-# kind: Deployment
 apiVersion: batch/v1
 kind: Job
 metadata:
   # generateName: omnictl-sync-job-
   name: omnictl-sync-job
-  namespace: kube-system
-  # annotations:
-  #   argocd.argoproj.io/sync-options: Replace=true
+  namespace: omni-system
+  annotations:
+    argocd.argoproj.io/sync-options: Force=true,Replace=true
 spec:
   backoffLimit: 1
   completions: 1
-  # selector:
-  #   matchLabels:
-  #     app: omnictl
   template:
-    # metadata:
-    #   labels:
-    #     app: omnictl
     spec:
       securityContext:
         fsGroup: 65534
@@ -43,7 +35,7 @@ spec:
           - >-
             git clone -n --depth=1 --filter=tree:0 https://github.com/dajrivera/k8s-cluster.git repo
             && cd repo
-            && git sparse-checkout set --no-cone /manifests/dev/cluster
+            && git sparse-checkout set --no-cone /manifests/dev/cluster/talos
             && git checkout
         volumeMounts:
         - mountPath: /omni
@@ -74,12 +66,9 @@ spec:
         command: ["/bin/sh","-c"]
         args:
           - >-
-            tree .
-            && cd repo/
-            && omnictl cluster template validate -f manifests/dev/cluster/k8s-cluster.yaml
-            && omnictl cluster template sync -f manifests/dev/cluster/k8s-cluster.yaml
-            # && echo waiting for updates...
-            # && sleep infinity
+            cd repo/
+            && omnictl cluster template validate -f manifests/dev/cluster/talos/k8s-cluster.yaml
+            && omnictl cluster template sync -f manifests/dev/cluster/talos/k8s-cluster.yaml
         volumeMounts:
         - mountPath: /omni
           name: omni
