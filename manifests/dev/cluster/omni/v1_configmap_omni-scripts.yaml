@@ -1,0 +1,62 @@
+apiVersion: v1
+data:
+  apply-changes.sh: |-
+    #!/bin/sh
+
+    cd repo/
+
+    source ./config-changes.sh
+
+    ## omnictl delete does not support the '-f' switch
+    # if [ ! -z "$CHANGES" ]; then
+    #   for PATCH in "$DELETES"; do
+    #     omnictl delete -f $PATCH
+    #   done
+    # fi
+
+    if [ ! -z "$CHANGES" ]; then
+      echo -n Updating configuration...
+      for PATCH in "$CHANGES"; do
+          omnictl apply -f $PATCH
+      done
+      echo done.
+      exit 0
+    fi
+
+    echo Nothing to do...
+  check-changes.sh: |-
+    #!/bin/sh
+
+    NL=$'\n'
+    PATCH_PATH="patches"
+    CHANGE_FILE="config-changes.sh"
+
+    git clone https://github.com/dajrivera/omni-infra.git repo
+
+    cd repo/
+
+    while IFS=$'\t' read ACTION FILE RENAME < <(git diff --name-status HEAD ":(glob)${PATCH_PATH}/**");
+    do
+      echo "Found ACTION=$ACTION on FILE=$FILE (RENAME=$RENAME).";
+      if [[ "$ACTION" == "R100" ]]; then
+        continue;
+      fi;
+      if [[ "$ACTION" == R* ]]; then
+        CHANGES+="${RENAME}${NL}";
+        continue;
+      fi;
+      if [[ "$ACTION" == "D" ]]; then
+        DELETES+="${FILE}${NL}";
+        continue;
+      fi;
+      CHANGES+="${FILE}${NL}";
+    done
+
+    cat <<EOF > $CHANGE_FILE
+    DELETES="$DELETES"
+    CHANGES="$CHANGES"
+    EOF
+kind: ConfigMap
+metadata:
+  name: omni-scripts
+  namespace: omni-system

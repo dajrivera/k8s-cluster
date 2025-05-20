@@ -1,0 +1,153 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: omni-scripts
+  namespace: omni-system
+data:
+  check-changes.sh: |-
+    #!/bin/sh
+
+    NL=$'\n'
+    PATCH_PATH="patches"
+    CHANGE_FILE="config-changes.sh"
+
+    git clone https://github.com/dajrivera/omni-infra.git repo
+
+    cd repo/
+
+    while IFS=$'\t' read ACTION FILE RENAME < <(git diff --name-status HEAD ":(glob)${PATCH_PATH}/**");
+    do
+      echo "Found ACTION=$ACTION on FILE=$FILE (RENAME=$RENAME).";
+      if [[ "$ACTION" == "R100" ]]; then
+        continue;
+      fi;
+      if [[ "$ACTION" == R* ]]; then
+        CHANGES+="${RENAME}${NL}";
+        continue;
+      fi;
+      if [[ "$ACTION" == "D" ]]; then
+        DELETES+="${FILE}${NL}";
+        continue;
+      fi;
+      CHANGES+="${FILE}${NL}";
+    done
+
+    cat <<EOF > $CHANGE_FILE
+    DELETES="$DELETES"
+    CHANGES="$CHANGES"
+    EOF
+  apply-changes.sh: |-
+    #!/bin/sh
+
+    cd repo/
+
+    source ./config-changes.sh
+
+    ## omnictl delete does not support the '-f' switch
+    # if [ ! -z "$CHANGES" ]; then
+    #   for PATCH in "$DELETES"; do
+    #     omnictl delete -f $PATCH
+    #   done
+    # fi
+    
+    if [ ! -z "$CHANGES" ]; then
+      echo -n Updating configuration...
+      for PATCH in "$CHANGES"; do
+          omnictl apply -f $PATCH
+      done
+      echo done.
+      exit 0
+    fi
+
+    echo Nothing to do...
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: omnictl-apply-job
+  namespace: omni-system
+  annotations:
+    argocd.argoproj.io/sync-options: Force=true,Replace=true
+spec:
+  backoffLimit: 1
+  completions: 1
+  template:
+    spec:
+      securityContext:
+        fsGroup: 65534
+        fsGroupChangePolicy: "Always"      
+      initContainers:
+      - name: clone-source-repo
+        image: docker.io/alpine/git:v2.47.2
+        env:
+        - name: HOME
+          value: /omni
+        securityContext:
+          privileged: false
+          runAsNonRoot: true
+          runAsUser: 65534
+          runAsGroup: 65534
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+        workingDir: /omni
+        command: ["/bin/sh","-c"]
+        args:
+          - |-
+            /tmp/check-changes.sh ||
+            sleep infinity
+        volumeMounts:
+        - mountPath: /omni
+          name: omni
+        - mountPath: /tmp/check-changes.sh
+          name: omni-scripts
+          subPath: check-changes.sh
+      containers:
+      - name: omnictl-apply-delete
+        image: ghcr.io/dajrivera/omnictl:v0.49.1
+        env:
+        - name: OMNI_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: omni-api-key
+              key: omniEndpoint
+        - name: OMNI_SERVICE_ACCOUNT_KEY
+          valueFrom:
+            secretKeyRef:
+              name: omni-api-key
+              key: omniServiceAccountKey
+        securityContext:
+          privileged: false
+          runAsNonRoot: true
+          runAsUser: 65534
+          runAsGroup: 65534
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+        command: ["/bin/sh","-c"]
+        args:
+          - |-
+            /tmp/apply-changes.sh ||
+            sleep infinity
+        volumeMounts:
+        - mountPath: /omni
+          name: omni
+        - mountPath: /tmp/apply-changes.sh
+          name: omni-scripts
+          subPath: apply-changes.sh
+      restartPolicy: Never
+      volumes:
+      - name: omni
+        emptyDir:
+          sizeLimit: 500Mi
+      - name: omni-scripts
+        configMap:
+            name: omni-scripts
+            defaultMode: 0554
+            items:
+            - key: check-changes.sh
+              path: check-changes.sh
+            - key: apply-changes.sh
+              path: apply-changes.sh
