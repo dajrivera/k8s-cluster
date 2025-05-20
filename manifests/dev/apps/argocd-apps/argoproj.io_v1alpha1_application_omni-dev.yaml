@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: omni-dev
+  namespace: argocd
+spec:
+  destination:
+    namespace: omni-system
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: manifests/dev/cluster/omni
+    repoURL: https://github.com/dajrivera/k8s-cluster.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      allowEmpty: false
+      prune: false
+      selfHeal: true
+  ignoreDifferences:
+    - group: ""
+      kind: Namespace
+      jsonPointers:
+        - /metadata/annotations/argocd.argoproj.io~1tracking-id

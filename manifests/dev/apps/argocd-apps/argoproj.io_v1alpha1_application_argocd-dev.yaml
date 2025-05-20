@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-dev
+  namespace: argocd
+spec:
+  destination:
+    namespace: argocd
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: manifests/dev/apps/argocd
+    repoURL: https://github.com/dajrivera/k8s-cluster.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      allowEmpty: false
+      prune: false
+      selfHeal: true
