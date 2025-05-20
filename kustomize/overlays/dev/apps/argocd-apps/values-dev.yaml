@@ -26,13 +26,17 @@ argocdApplications:
     directory:
       recurse: false
       exclude: "{k8s-cluster.yaml,bootstrap/*}"
-      # include: "omni-cluster-sync-job.yaml"
     appCategory: cluster
   omni:
+    repoURL: https://github.com/dajrivera/omni-infra.git
+    path: "."
     disableAutomated: false
     disable: false
     name: omni
     namespace: omni-system
+    directory:
+      recurse: true
+      include: "{manifests/*}"
     appCategory: cluster
     ignoreDifferences:
       - group: ""

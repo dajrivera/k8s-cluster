@@ -1,6 +1,0 @@
-apiVersion: builtin
-kind: HelmChartInflationGenerator
-metadata:
-  name: omni-cluster
-chartHome: ../../../../../helm/base/cluster/omni/charts
-#valuesFile: values-dev.yaml

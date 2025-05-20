@@ -14,8 +14,11 @@ spec:
     kind: Namespace
   project: default
   source:
-    path: manifests/dev/cluster/omni
-    repoURL: https://github.com/dajrivera/k8s-cluster.git
+    directory:
+      include: '{manifests/*}'
+      recurse: true
+    path: .
+    repoURL: https://github.com/dajrivera/omni-infra.git
     targetRevision: HEAD
   syncPolicy:
     automated:
