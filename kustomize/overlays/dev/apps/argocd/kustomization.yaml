@@ -4,3 +4,5 @@ resources:
   - ../../../../base/apps/argocd/
 generators:
   - ../../../../../helm/overlays/dev/apps/argocd/
+patches:
+  - path: dashboard-patch.yaml
