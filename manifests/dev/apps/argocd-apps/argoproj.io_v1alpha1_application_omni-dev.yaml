@@ -7,6 +7,11 @@ spec:
   destination:
     namespace: omni-system
     server: https://kubernetes.default.svc
+  ignoreDifferences:
+  - group: ""
+    jsonPointers:
+    - /metadata/annotations/argocd.argoproj.io~1tracking-id
+    kind: Namespace
   project: default
   source:
     path: manifests/dev/cluster/omni
@@ -17,8 +22,3 @@ spec:
       allowEmpty: false
       prune: false
       selfHeal: true
-  ignoreDifferences:
-    - group: ""
-      kind: Namespace
-      jsonPointers:
-        - /metadata/annotations/argocd.argoproj.io~1tracking-id

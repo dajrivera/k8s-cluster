@@ -34,6 +34,11 @@ argocdApplications:
     name: omni
     namespace: omni-system
     appCategory: cluster
+    ignoreDifferences:
+      - group: ""
+        kind: Namespace
+        jsonPointers:
+          - /metadata/annotations/argocd.argoproj.io~1tracking-id    
   hostNetwork:
     disableAutomated: false
     disable: false

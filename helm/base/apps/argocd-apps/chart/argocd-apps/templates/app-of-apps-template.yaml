@@ -9,17 +9,21 @@ metadata:
 spec:
   project: {{ $.Values.global.spec.project }}
   source:
-    repoURL:  {{ $.Values.global.spec.source.repoURL }}
+    repoURL:  {{ default $.Values.global.spec.source.repoURL .repoURL }}
     targetRevision: {{ default $.Values.global.spec.source.targetRevision .targetRevision }}
+  {{- if hasKey . "path" }}
+    path: {{ .path }}
+  {{- else }}
   {{- if hasKey . "appCategory" }}
     path: manifests/{{ $.Values.global.env }}/{{ .appCategory }}/{{ .name }}
   {{- else }}
     path: manifests/{{ $.Values.global.env }}/{{ .name }}
   {{- end }}
+  {{- end }}
   {{- if not (empty .directory) }}
     directory:
   {{- .directory | toYaml | nindent 6}}
-  {{- end }}
+  {{- end }} 
   destination:
     namespace: {{ default $.Values.global.spec.destination.namespace .namespace }}
     server: {{ $.Values.global.spec.destination.server }}
@@ -30,6 +34,10 @@ spec:
       selfHeal: true
       allowEmpty: false
     {{- end }}
+{{- if not (empty .ignoreDifferences) }}
+  ignoreDifferences:
+{{- .ignoreDifferences | toYaml | nindent 4}}
+{{- end }}
 #    syncOptions:
 #      - CreateNamespace=true
 ---
