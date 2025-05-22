@@ -7,11 +7,6 @@ spec:
   destination:
     namespace: omni-system
     server: https://kubernetes.default.svc
-  ignoreDifferences:
-  - group: ""
-    jsonPointers:
-    - /metadata/annotations/argocd.argoproj.io~1tracking-id
-    kind: Namespace
   project: default
   source:
     directory:

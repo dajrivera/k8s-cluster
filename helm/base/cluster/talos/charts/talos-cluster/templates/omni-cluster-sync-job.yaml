@@ -2,8 +2,8 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   # generateName: omnictl-sync-job-
-  name: omnictl-sync-job
-  namespace: omni-system
+  name: omnictl-cluster-sync-job
+  namespace: talos-system
   annotations:
     argocd.argoproj.io/sync-options: Force=true,Replace=true
 spec:

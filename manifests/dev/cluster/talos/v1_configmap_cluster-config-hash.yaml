@@ -5,4 +5,4 @@ data:
 kind: ConfigMap
 metadata:
   name: cluster-config-hash
-  namespace: omni-system
+  namespace: talos-system

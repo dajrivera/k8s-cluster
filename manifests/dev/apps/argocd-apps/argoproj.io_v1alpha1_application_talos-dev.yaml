@@ -5,7 +5,7 @@ metadata:
   namespace: argocd
 spec:
   destination:
-    namespace: omni-system
+    namespace: talos-system
     server: https://kubernetes.default.svc
   project: default
   source:

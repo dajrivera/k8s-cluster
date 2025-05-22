@@ -22,7 +22,7 @@ argocdApplications:
     disableAutomated: false
     disable: false
     name: talos
-    namespace: omni-system
+    namespace: talos-system
     directory:
       recurse: false
       exclude: "{k8s-cluster.yaml,bootstrap/*}"
@@ -37,12 +37,7 @@ argocdApplications:
     directory:
       recurse: true
       include: "{manifests/*}"
-    appCategory: cluster
-    ignoreDifferences:
-      - group: ""
-        kind: Namespace
-        jsonPointers:
-          - /metadata/annotations/argocd.argoproj.io~1tracking-id    
+    appCategory: cluster 
   hostNetwork:
     disableAutomated: false
     disable: false

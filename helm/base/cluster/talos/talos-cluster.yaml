@@ -5,6 +5,6 @@ metadata:
 name: talos-cluster
 chartHome: charts
 releaseName: talos-cluster
-namespace: omni-system
+namespace: talos-system
 includeCRDs: true
 skipHooks: false
