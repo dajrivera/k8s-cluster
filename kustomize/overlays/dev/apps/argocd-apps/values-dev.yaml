@@ -25,7 +25,6 @@ argocdApplications:
     namespace: talos-system
     directory:
       recurse: false
-      exclude: "{k8s-cluster.yaml,bootstrap/*}"
     appCategory: cluster
   omni:
     repoURL: https://github.com/dajrivera/omni-infra.git
