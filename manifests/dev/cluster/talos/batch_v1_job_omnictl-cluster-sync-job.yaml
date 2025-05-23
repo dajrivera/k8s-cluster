@@ -28,7 +28,7 @@ spec:
             secretKeyRef:
               key: omniServiceAccountKey
               name: omni-api-key
-        image: ghcr.io/dajrivera/omnictl:v0.49.1
+        image: ghcr.io/dajrivera/omnictl:v0.50.0
         name: cluster-template-sync
         securityContext:
           allowPrivilegeEscalation: false
