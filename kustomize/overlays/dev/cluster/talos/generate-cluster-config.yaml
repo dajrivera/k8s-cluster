@@ -9,6 +9,6 @@ metadata:
 spec:
   configPaths:
     # relative to git top level
-    - /k8s-cluster.yaml
-    - /bootstrap
+    - k8s-cluster.yaml
+    - bootstrap
   outputPath: ../../../../../manifests/dev/cluster/talos

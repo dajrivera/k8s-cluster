@@ -19,11 +19,21 @@ while read RESOURCE; do
   # echo KUSTOMIZE_BASE=$KUSTOMIZE_BASE
   # echo MANIFESTS_DST=$MANIFESTS_DST
 
+  RESOURCE_PATHS=("$HELM_BASE" "$HELM_OVERLAY" "$KUSTOMIZE_BASE" "$RESOURCE")
+
+  # add talos cluster config paths to diff check for talos app
+  if [ "$APP" = "cluster/talos" ]; then
+    TALOS_CONF=($(yq e '.spec.configPaths[]' "${RESOURCE}/generate-cluster-config.yaml"))
+    RESOURCE_PATHS+=(${TALOS_CONF[@]})
+  fi
+
+  #echo "RESOURCE_PATHS: ${RESOURCE_PATHS[@]}" >&2
+
   echo -n "Generating manifest files for ${APP}..."
 
   # check for changes
   # need to check app specific helm/{base,overlays}, kustomize/{base,overlays}
-  CHANGES_LIST=$(git diff --staged --name-only HEAD "$HELM_BASE" "$HELM_OVERLAY" "$KUSTOMIZE_BASE" "$RESOURCE")
+  CHANGES_LIST=$(git diff --staged --name-only HEAD ${RESOURCE_PATHS[@]})
   if [ ! -z "$CHANGES_LIST" ]; then
     # cleanup existing manifests
     rm -rf "${MANIFESTS_DST}"
