@@ -1,7 +1,7 @@
 kind: Cluster
 name: k8s-homelab
 kubernetes:
-  version: v1.32.5
+  version: v1.33.1
 talos:
   version: v1.10.2
 features:
