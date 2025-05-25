@@ -7,8 +7,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: argocd-application-controller
     app.kubernetes.io/part-of: argocd
-    app.kubernetes.io/version: v3.0.1
-    helm.sh/chart: argo-cd-8.0.3
+    app.kubernetes.io/version: v3.0.3
+    helm.sh/chart: argo-cd-8.0.9
   name: argo-cd-argocd-application-controller
   namespace: argocd
 spec:
@@ -22,16 +22,16 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/cm: 9c5cbc84a319fe31f2c6fc54e98ffe9ba138d950f87da8511716b9896088648d
-        checksum/cmd-params: 00d54a450245d26a4d73416d4cce1a380b1f14c7d1d03125b15709a854894406
+        checksum/cm: e9a3951237b3cbb9b8a1e7ebb72dcf8851ddf4e60a0b4071e68432eae072aa48
+        checksum/cmd-params: de162fe4b896427ade34563cb62c5274335105532d6b6fca52018e80e5971d1b
       labels:
         app.kubernetes.io/component: application-controller
         app.kubernetes.io/instance: argo-cd
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: argocd-application-controller
         app.kubernetes.io/part-of: argocd
-        app.kubernetes.io/version: v3.0.1
-        helm.sh/chart: argo-cd-8.0.3
+        app.kubernetes.io/version: v3.0.3
+        helm.sh/chart: argo-cd-8.0.9
     spec:
       affinity:
         podAntiAffinity:
@@ -312,7 +312,7 @@ spec:
               optional: true
         - name: KUBECACHEDIR
           value: /tmp/kubecache
-        image: quay.io/argoproj/argocd:v3.0.1
+        image: quay.io/argoproj/argocd:v3.0.3
         imagePullPolicy: IfNotPresent
         name: application-controller
         ports:

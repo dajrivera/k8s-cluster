@@ -9,5 +9,4 @@ releaseName: argo-cd
 namespace: argocd
 includeCRDs: true
 skipHooks: false
-version: 8.0.3
-#valuesFile: values.yaml
+version: 8.0.9
