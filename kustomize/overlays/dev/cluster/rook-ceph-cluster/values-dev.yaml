@@ -22,8 +22,8 @@ cephClusterSpec:
     connections:
     provider: multus
     selectors:
-      public: public-conf
-      cluster: cluster-conf
+      public: public-net
+      cluster: cluster-net
   priorityClassNames:
     mon: system-node-critical
     osd: system-node-critical

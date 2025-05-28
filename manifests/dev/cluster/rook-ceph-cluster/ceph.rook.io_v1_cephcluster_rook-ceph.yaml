@@ -61,8 +61,8 @@ spec:
   network:
     provider: multus
     selectors:
-      cluster: cluster-conf
-      public: public-conf
+      cluster: cluster-net
+      public: public-net
   priorityClassNames:
     mgr: system-cluster-critical
     mon: system-node-critical
