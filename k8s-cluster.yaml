@@ -50,7 +50,7 @@ patches:
   - name: extramanifests-cilium
     file: bootstrap/k8s-cluster-extramanifests-cilium.yaml
   - name: extramanifests-gateway-api-crds
-    file: k8s-cluster-extranmanifests-gateway-api-crds.yaml    
+    file: bootstrap/k8s-cluster-extramanifests-gateway-api-crds.yaml    
   - name: extramanifests-argocd
     file: bootstrap/k8s-cluster-extramanifests-argocd.yaml
   - name: extramanifests-argocd-projects
