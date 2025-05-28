@@ -4,3 +4,10 @@ resources:
   - ../../../../base/monitoring/kube-prometheus-stack/
 generators:
   - ../../../../../helm/overlays/dev/monitoring/kube-prometheus-stack/
+patches:
+  - patch: |
+      - op: add
+        path: /metadata/annotations/argocd.argoproj.io~1sync-options
+        value: Replace=true
+    target:
+      kind: CustomResourceDefinition
