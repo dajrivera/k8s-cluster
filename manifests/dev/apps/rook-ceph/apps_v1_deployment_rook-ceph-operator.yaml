@@ -117,7 +117,7 @@ spec:
                   cpu: null
                 limits:
                   memory: 256Mi
-          csiNFSPluginResource: |-
+          csiNFSPluginResource: |
             - name : driver-registrar
               resource:
                 requests:
