@@ -3,4 +3,5 @@ kind: Namespace
 metadata:
   labels:
     name: kube-prometheus-system
+    pod-security.kubernetes.io/enforce: privileged
   name: kube-prometheus-system
