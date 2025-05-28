@@ -1,0 +1,7 @@
+cluster:
+  extraManifests:
+    - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/cluster/gateway-api-crds/apiextensions.k8s.io_v1_customresourcedefinition_gatewayclasses.gateway.networking.k8s.io.yaml
+    - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/cluster/gateway-api-crds/apiextensions.k8s.io_v1_customresourcedefinition_gateways.gateway.networking.k8s.io.yaml
+    - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/cluster/gateway-api-crds/apiextensions.k8s.io_v1_customresourcedefinition_grpcroutes.gateway.networking.k8s.io.yaml
+    - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/cluster/gateway-api-crds/apiextensions.k8s.io_v1_customresourcedefinition_httproutes.gateway.networking.k8s.io.yaml
+    - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/cluster/gateway-api-crds/apiextensions.k8s.io_v1_customresourcedefinition_httproutes.gateway.networking.k8s.io.yaml

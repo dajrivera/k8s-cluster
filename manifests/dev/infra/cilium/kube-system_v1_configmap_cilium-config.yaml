@@ -85,7 +85,7 @@ data:
   envoy-config-retry-interval: 15s
   envoy-keep-cap-netbindservice: "true"
   external-envoy-proxy: "true"
-  gateway-api-hostnetwork-enabled: "false"
+  gateway-api-hostnetwork-enabled: "true"
   gateway-api-hostnetwork-nodelabelselector: ""
   gateway-api-secrets-namespace: cilium-secrets
   gateway-api-service-externaltrafficpolicy: Cluster

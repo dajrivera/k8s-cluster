@@ -4,6 +4,9 @@ cluster:
 ipam:
   mode: kubernetes
 kubeProxyReplacement: true
+nodePort:
+  enabled: true
+l7Proxy: true
 securityContext:
   capabilities:
     ciliumAgent:
@@ -44,6 +47,8 @@ bpf:
 #  hostLegacyRouting: true
 gatewayAPI:
   enabled: true
+  hostNetwork:
+    enabled: true
 #clustermesh:
 #  apiserver:
 #    tls:

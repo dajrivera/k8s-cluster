@@ -49,12 +49,14 @@ patches:
     file: bootstrap/k8s-cluster-extramanifests-multus.yaml
   - name: extramanifests-cilium
     file: bootstrap/k8s-cluster-extramanifests-cilium.yaml
+  - name: extramanifests-gateway-api-crds
+    file: k8s-cluster-extranmanifests-gateway-api-crds.yaml    
   - name: extramanifests-argocd
     file: bootstrap/k8s-cluster-extramanifests-argocd.yaml
   - name: extramanifests-argocd-projects
     file: bootstrap/k8s-cluster-extramanifests-argocd-projects.yaml
   - name: extramanifests-argocd-apps
-    file: bootstrap/k8s-cluster-extramanifests-argocd-apps.yaml    
+    file: bootstrap/k8s-cluster-extramanifests-argocd-apps.yaml
 ---
 kind: ControlPlane
 machineClass:
