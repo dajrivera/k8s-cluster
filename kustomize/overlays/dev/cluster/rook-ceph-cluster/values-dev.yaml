@@ -27,7 +27,7 @@ cephClusterSpec:
   dashboard:
     enabled: true
     # urlPrefix: /ceph-dashboard
-    port: 8443
+    port: 8080
     ssl: false
   network:
     connections:
@@ -35,6 +35,18 @@ cephClusterSpec:
     selectors:
       public: public-net
       cluster: cluster-net
+  annotations:
+  #   all:
+  #   mon:
+  #   osd:
+  #   cleanup:
+  #   prepareosd:
+  #   # If no mgr annotations are set, prometheus scrape annotations will be set by default.
+  #   mgr:
+    dashboard:
+      omni-kube-service-exposer.sidero.dev/label: Ceph Dashboard
+      omni-kube-service-exposer.sidero.dev/port: "50082"
+      omni-kube-service-exposer.sidero.dev/prefix: cephdash      
   resources:
     mgr:
       limits:
