@@ -1,0 +1,9 @@
+namespaceOverride: kube-prometheus-system
+alertmanager:
+  namespaceOverride: kube-prometheus-system
+grafana:
+  namespaceOverride: kube-prometheus-system
+kube-state-metrics:
+  namespaceOverride: kube-prometheus-system
+prometheus-node-exporter:
+  namespaceOverride: kube-prometheus-system
