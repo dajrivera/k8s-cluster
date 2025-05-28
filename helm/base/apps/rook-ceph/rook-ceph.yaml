@@ -1,0 +1,12 @@
+apiVersion: builtin
+kind: HelmChartInflationGenerator
+metadata:
+  name: rook-ceph
+name: rook-ceph
+repo: https://charts.rook.io/release
+chartHome: ../../../../../charts
+releaseName: rook-ceph
+namespace: rook-ceph
+includeCRDs: true
+skipHooks: false
+version: 1.17.2
