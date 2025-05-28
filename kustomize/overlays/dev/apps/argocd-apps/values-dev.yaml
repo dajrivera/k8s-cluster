@@ -55,6 +55,29 @@ argocdApplications:
     name: cilium
     namespace: kube-system
     appCategory: infra
+  gateway-api-crds:
+    disableAutomated: false
+    disable: false
+    name: gateway-api-crds
+    appCategory: cluster
+  kube-prometheus-stack:
+    disableAutomated: false
+    disable: false
+    name: kube-prometheus-stack
+    namespace: kube-prometheus-system
+    appCategory: monitoring
+  rook-ceph:
+    disableAutomated: false
+    disable: false
+    name: rook-ceph
+    namespace: rook-ceph
+    appCategory: apps
+  rook-ceph-cluster:
+    disableAutomated: false
+    disable: false
+    name: rook-ceph-cluster
+    namespace: rook-ceph
+    appCategory: cluster
   argocdApps:
     disableAutomated: false
     disable: false

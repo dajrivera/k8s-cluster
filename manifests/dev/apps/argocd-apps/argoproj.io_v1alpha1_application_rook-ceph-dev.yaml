@@ -1,17 +1,15 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: talos-dev
+  name: rook-ceph-dev
   namespace: argocd
 spec:
   destination:
-    namespace: talos-system
+    namespace: rook-ceph
     server: https://kubernetes.default.svc
   project: default
   source:
-    directory:
-      recurse: false
-    path: manifests/dev/cluster/talos
+    path: manifests/dev/apps/rook-ceph
     repoURL: https://github.com/dajrivera/k8s-cluster.git
     targetRevision: HEAD
   syncPolicy:
