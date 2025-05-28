@@ -1,3 +1,8 @@
+# -- Cluster ceph.conf override
+configOverride: |
+  [global]
+  osd_pool_default_size: "1"
+  mon_warn_on_pool_no_redundancy: "false"
 toolbox:
   enabled: true
   resources:
@@ -101,6 +106,7 @@ cephBlockPools:
       failureDomain: host
       replicated:
         size: 1
+      deviceClass: hdd
     storageClass:
       enabled: true
       name: ceph-block
@@ -122,17 +128,47 @@ cephBlockPools:
         csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
         csi.storage.k8s.io/node-stage-secret-namespace: "{{ .Release.Namespace }}"
         csi.storage.k8s.io/fstype: ext4
+  - name: ceph-blockpool-fast
+    spec:
+      failureDomain: host
+      replicated:
+        size: 1
+      deviceClass: ssd
+    storageClass:
+      enabled: true
+      name: ceph-block-fast
+      annotations: {}
+      labels: {}
+      isDefault: false
+      reclaimPolicy: Delete
+      allowVolumeExpansion: true
+      volumeBindingMode: "Immediate"
+      mountOptions: []
+      allowedTopologies: []
+      parameters:
+        imageFormat: "2"
+        imageFeatures: layering
+        csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+        csi.storage.k8s.io/provisioner-secret-namespace: "{{ .Release.Namespace }}"
+        csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+        csi.storage.k8s.io/controller-expand-secret-namespace: "{{ .Release.Namespace }}"
+        csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+        csi.storage.k8s.io/node-stage-secret-namespace: "{{ .Release.Namespace }}"
+        csi.storage.k8s.io/fstype: ext4
 cephFileSystems:
   - name: ceph-filesystem
     spec:
       metadataPool:
+        failureDomain: host
         replicated:
           size: 1
+        deviceClass: ssd
       dataPools:
         - failureDomain: host
           replicated:
             size: 1
           name: data0
+          deviceClass: hdd
       metadataServer:
         activeCount: 1
         activeStandby: true
@@ -169,12 +205,14 @@ cephObjectStores:
         failureDomain: host
         replicated:
           size: 1
+        deviceClass: ssd
       dataPool:
         failureDomain: host
         replicated:
           size: 1
         parameters:
           bulk: "true"
+        deviceClass: hdd
       preservePoolsOnDelete: true
       gateway:
         port: 80
