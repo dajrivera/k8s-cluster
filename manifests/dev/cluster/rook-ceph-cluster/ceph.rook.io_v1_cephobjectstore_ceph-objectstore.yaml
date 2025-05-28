@@ -1,0 +1,27 @@
+apiVersion: ceph.rook.io/v1
+kind: CephObjectStore
+metadata:
+  name: ceph-objectstore
+  namespace: rook-ceph
+spec:
+  dataPool:
+    failureDomain: host
+    parameters:
+      bulk: "true"
+    replicated:
+      size: 1
+  gateway:
+    instances: 1
+    port: 80
+    priorityClassName: system-cluster-critical
+    resources:
+      limits:
+        memory: 2Gi
+      requests:
+        cpu: 1000m
+        memory: 1Gi
+  metadataPool:
+    failureDomain: host
+    replicated:
+      size: 1
+  preservePoolsOnDelete: true

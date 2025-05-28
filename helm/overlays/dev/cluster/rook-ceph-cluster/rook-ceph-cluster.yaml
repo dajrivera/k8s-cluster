@@ -1,0 +1,5 @@
+apiVersion: builtin
+kind: HelmChartInflationGenerator
+metadata:
+  name: rook-ceph-cluster
+valuesFile: values-dev.yaml
