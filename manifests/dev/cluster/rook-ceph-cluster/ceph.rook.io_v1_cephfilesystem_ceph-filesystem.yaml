@@ -20,5 +20,5 @@ spec:
       limits:
         memory: 4Gi
       requests:
-        cpu: 1000m
+        cpu: null
         memory: 4Gi

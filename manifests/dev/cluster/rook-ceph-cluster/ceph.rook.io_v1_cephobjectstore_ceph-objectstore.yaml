@@ -18,7 +18,7 @@ spec:
       limits:
         memory: 2Gi
       requests:
-        cpu: 1000m
+        cpu: null
         memory: 1Gi
   metadataPool:
     failureDomain: host

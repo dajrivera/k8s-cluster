@@ -1,5 +1,11 @@
 toolbox:
   enabled: true
+  resources:
+    limits:
+      memory: "1Gi"
+    requests:
+      cpu: null
+      memory: "128Mi"  
 monitoring:
   enabled: true
 cephClusterSpec:
@@ -24,6 +30,67 @@ cephClusterSpec:
     selectors:
       public: public-net
       cluster: cluster-net
+  resources:
+    mgr:
+      limits:
+        memory: "1Gi"
+      requests:
+        cpu: null
+        memory: "512Mi"
+    mon:
+      limits:
+        memory: "2Gi"
+      requests:
+        cpu: null
+        memory: "1Gi"
+    osd:
+      limits:
+        memory: "4Gi"
+      requests:
+        cpu: null
+        memory: "4Gi"
+    prepareosd:
+      # limits: It is not recommended to set limits on the OSD prepare job
+      #         since it's a one-time burst for memory that must be allowed to
+      #         complete without an OOM kill.  Note however that if a k8s
+      #         limitRange guardrail is defined external to Rook, the lack of
+      #         a limit here may result in a sync failure, in which case a
+      #         limit should be added.  1200Mi may suffice for up to 15Ti
+      #         OSDs ; for larger devices 2Gi may be required.
+      #         cf. https://github.com/rook/rook/pull/11103
+      requests:
+        cpu: null
+        memory: "50Mi"
+    mgr-sidecar:
+      limits:
+        memory: "100Mi"
+      requests:
+        cpu: null
+        memory: "40Mi"
+    crashcollector:
+      limits:
+        memory: "60Mi"
+      requests:
+        cpu: null
+        memory: "60Mi"
+    logcollector:
+      limits:
+        memory: "1Gi"
+      requests:
+        cpu: null
+        memory: "100Mi"
+    cleanup:
+      limits:
+        memory: "1Gi"
+      requests:
+        cpu: null
+        memory: "100Mi"
+    exporter:
+      limits:
+        memory: "128Mi"
+      requests:
+        cpu: null
+        memory: "50Mi"
   priorityClassNames:
     mon: system-node-critical
     osd: system-node-critical
@@ -73,7 +140,7 @@ cephFileSystems:
           limits:
             memory: "4Gi"
           requests:
-            cpu: "1000m"
+            cpu: null
             memory: "4Gi"
         priorityClassName: system-cluster-critical
     storageClass:
@@ -115,7 +182,7 @@ cephObjectStores:
           limits:
             memory: "2Gi"
           requests:
-            cpu: "1000m"
+            cpu: null
             memory: "1Gi"
         instances: 1
         priorityClassName: system-cluster-critical
