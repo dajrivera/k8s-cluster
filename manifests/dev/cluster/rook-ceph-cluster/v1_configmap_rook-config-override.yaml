@@ -3,8 +3,8 @@ data:
   config: |2
 
     [global]
-    osd_pool_default_size: "1"
-    mon_warn_on_pool_no_redundancy: "false"
+    osd_pool_default_size = 1
+    mon_warn_on_pool_no_redundancy = false
 kind: ConfigMap
 metadata:
   name: rook-config-override
