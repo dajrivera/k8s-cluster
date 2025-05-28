@@ -1,0 +1,24 @@
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: cluster-net
+  namespace: rook-ceph
+spec:
+  config: |-
+    {
+      "cniVersion": "0.3.1",
+      "name": "cluster-net",
+      "type": "bridge",
+      "bridge": "br-ext",
+      "vlan": 3100,
+      "ipam": {
+        "type": "host-local",
+        "ranges": [
+          [ {
+            "subnet": "10.20.0.0/16",
+            "rangeStart": "10.20.0.1",
+            "rangeEnd": "10.20.255.254"
+          } ]
+        ]
+      }
+    }

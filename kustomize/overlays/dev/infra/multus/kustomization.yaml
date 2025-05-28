@@ -3,6 +3,8 @@ kind: Kustomization
 resources:
   - ../../../../base/infra/multus/
   - multus-cni-config.yaml
+  - bridge-vlan-public-net.yaml
+  - bridge-vlan-cluster-net.yaml
 patches:
   - path: multus-daemon-config-patch.yaml
     target:
