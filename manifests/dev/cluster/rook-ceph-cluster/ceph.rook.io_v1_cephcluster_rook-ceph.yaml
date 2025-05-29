@@ -25,6 +25,8 @@ spec:
   dashboard:
     enabled: true
     port: 8080
+    prometheusEndpoint: http://rook-prometheus:9090
+    prometheusEndpointSSLVerify: false
     ssl: false
   dataDirHostPath: /var/lib/rook
   disruptionManagement:

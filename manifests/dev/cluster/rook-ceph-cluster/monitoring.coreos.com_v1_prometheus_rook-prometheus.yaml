@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  labels:
+    prometheus: rook-prometheus
+  name: rook-prometheus
+  namespace: rook-ceph
+spec:
+  resources:
+    requests:
+      memory: 400Mi
+  ruleSelector:
+    matchLabels:
+      prometheus: rook-prometheus
+      role: alert-rules
+  serviceAccountName: prometheus
+  serviceMonitorSelector:
+    matchLabels:
+      team: rook

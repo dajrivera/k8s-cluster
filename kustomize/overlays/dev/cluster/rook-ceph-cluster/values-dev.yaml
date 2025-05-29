@@ -13,6 +13,7 @@ toolbox:
       memory: "128Mi"  
 monitoring:
   enabled: true
+  createPrometheusRules: true
 cephClusterSpec:
   cephVersion:
     image: quay.io/ceph/ceph:v19.2.2
@@ -26,6 +27,8 @@ cephClusterSpec:
         enabled: true
   dashboard:
     enabled: true
+    prometheusEndpoint: http://rook-prometheus:9090
+    prometheusEndpointSSLVerify: false
     # urlPrefix: /ceph-dashboard
     port: 8080
     ssl: false
