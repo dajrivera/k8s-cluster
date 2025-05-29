@@ -4,6 +4,7 @@ resources:
   requests:
     cpu: null
     memory: 128Mi
+csi:
   # -- CEPH CSI RBD provisioner resource requirement list
   # csi-omap-generator resources will be applied only if `enableOMAPGenerator` is set to `true`
   # @default -- see values.yaml

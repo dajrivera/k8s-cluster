@@ -7,21 +7,21 @@ data:
       resource:
         requests:
           memory: 128Mi
-          cpu: 50m
+          cpu: null
         limits:
           memory: 256Mi
     - name : csi-cephfsplugin
       resource:
         requests:
           memory: 512Mi
-          cpu: 250m
+          cpu: null
         limits:
           memory: 1Gi
     - name : liveness-prometheus
       resource:
         requests:
           memory: 128Mi
-          cpu: 50m
+          cpu: null
         limits:
           memory: 256Mi
   CSI_CEPHFS_PROVISIONER_RESOURCE: |
@@ -29,42 +29,42 @@ data:
       resource:
         requests:
           memory: 128Mi
-          cpu: 100m
+          cpu: null
         limits:
           memory: 256Mi
     - name : csi-resizer
       resource:
         requests:
           memory: 128Mi
-          cpu: 100m
+          cpu: null
         limits:
           memory: 256Mi
     - name : csi-attacher
       resource:
         requests:
           memory: 128Mi
-          cpu: 100m
+          cpu: null
         limits:
           memory: 256Mi
     - name : csi-snapshotter
       resource:
         requests:
           memory: 128Mi
-          cpu: 100m
+          cpu: null
         limits:
           memory: 256Mi
     - name : csi-cephfsplugin
       resource:
         requests:
           memory: 512Mi
-          cpu: 250m
+          cpu: null
         limits:
           memory: 1Gi
     - name : liveness-prometheus
       resource:
         requests:
           memory: 128Mi
-          cpu: 50m
+          cpu: null
         limits:
           memory: 256Mi
   CSI_ENABLE_CEPHFS_SNAPSHOTTER: "true"
@@ -86,14 +86,14 @@ data:
       resource:
         requests:
           memory: 128Mi
-          cpu: 50m
+          cpu: null
         limits:
           memory: 256Mi
     - name : csi-nfsplugin
       resource:
         requests:
           memory: 512Mi
-          cpu: 250m
+          cpu: null
         limits:
           memory: 1Gi
   CSI_NFS_PROVISIONER_RESOURCE: |
@@ -101,21 +101,21 @@ data:
       resource:
         requests:
           memory: 128Mi
-          cpu: 100m
+          cpu: null
         limits:
           memory: 256Mi
     - name : csi-nfsplugin
       resource:
         requests:
           memory: 512Mi
-          cpu: 250m
+          cpu: null
         limits:
           memory: 1Gi
     - name : csi-attacher
       resource:
         requests:
           memory: 512Mi
-          cpu: 250m
+          cpu: null
         limits:
           memory: 1Gi
   CSI_PLUGIN_ENABLE_SELINUX_HOST_MOUNT: "false"
@@ -129,21 +129,21 @@ data:
       resource:
         requests:
           memory: 128Mi
-          cpu: 50m
+          cpu: null
         limits:
           memory: 256Mi
     - name : csi-rbdplugin
       resource:
         requests:
           memory: 512Mi
-          cpu: 250m
+          cpu: null
         limits:
           memory: 1Gi
     - name : liveness-prometheus
       resource:
         requests:
           memory: 128Mi
-          cpu: 50m
+          cpu: null
         limits:
           memory: 256Mi
   CSI_RBD_PROVISIONER_RESOURCE: |
@@ -151,28 +151,28 @@ data:
       resource:
         requests:
           memory: 128Mi
-          cpu: 100m
+          cpu: null
         limits:
           memory: 256Mi
     - name : csi-resizer
       resource:
         requests:
           memory: 128Mi
-          cpu: 100m
+          cpu: null
         limits:
           memory: 256Mi
     - name : csi-attacher
       resource:
         requests:
           memory: 128Mi
-          cpu: 100m
+          cpu: null
         limits:
           memory: 256Mi
     - name : csi-snapshotter
       resource:
         requests:
           memory: 128Mi
-          cpu: 100m
+          cpu: null
         limits:
           memory: 256Mi
     - name : csi-rbdplugin
@@ -185,14 +185,14 @@ data:
       resource:
         requests:
           memory: 512Mi
-          cpu: 250m
+          cpu: null
         limits:
           memory: 1Gi
     - name : liveness-prometheus
       resource:
         requests:
           memory: 128Mi
-          cpu: 50m
+          cpu: null
         limits:
           memory: 256Mi
   ROOK_CEPH_ALLOW_LOOP_DEVICES: "false"
