@@ -13,6 +13,13 @@ spec:
       size: 1
   gateway:
     instances: 1
+    opsLogSidecar:
+      resources:
+        limits:
+          memory: 100Mi
+        requests:
+          cpu: null
+          memory: 40Mi
     port: 80
     priorityClassName: system-cluster-critical
     resources:
