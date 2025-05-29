@@ -1,6 +1,6 @@
 apiVersion: v1
 data:
-  clusterConfigHash: f1eaef43113608b8b8d1ac6bda1b4693413b14ba
+  clusterConfigHash: 6e4bb3e70e231b1760644d3306cb68e60dcc97e6
 kind: ConfigMap
 metadata:
   name: cluster-config-hash
