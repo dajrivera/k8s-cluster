@@ -84,6 +84,11 @@ argocdApplications:
     name: argocd-apps
     namespace: argocd
     appCategory: apps
+    ignoreDifferences:
+      - group: argoproj.io
+        kind: Application
+        jsonPointers:
+          - /spec/syncPolicy
   certManager:
     disableAutomated: false
     disable: false
