@@ -7,8 +7,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: argocd-application-controller
     app.kubernetes.io/part-of: argocd
-    app.kubernetes.io/version: v3.0.3
-    helm.sh/chart: argo-cd-8.0.9
+    app.kubernetes.io/version: v3.0.5
+    helm.sh/chart: argo-cd-8.0.13
   name: argo-cd-argocd-application-controller
   namespace: argocd
 spec:
@@ -22,16 +22,16 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/cm: e9a3951237b3cbb9b8a1e7ebb72dcf8851ddf4e60a0b4071e68432eae072aa48
-        checksum/cmd-params: de162fe4b896427ade34563cb62c5274335105532d6b6fca52018e80e5971d1b
+        checksum/cm: b4531c4d8e20b27e92fe7c16b48e8f7fd58d67c5e98c216fde4cb09cffbd8ec9
+        checksum/cmd-params: 2c83cae5ca7c2b62e82842064ef6bc097d29aecd878cbbb924416405963f84d4
       labels:
         app.kubernetes.io/component: application-controller
         app.kubernetes.io/instance: argo-cd
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: argocd-application-controller
         app.kubernetes.io/part-of: argocd
-        app.kubernetes.io/version: v3.0.3
-        helm.sh/chart: argo-cd-8.0.9
+        app.kubernetes.io/version: v3.0.5
+        helm.sh/chart: argo-cd-8.0.13
     spec:
       affinity:
         podAntiAffinity:
@@ -146,6 +146,12 @@ spec:
           valueFrom:
             configMapKeyRef:
               key: controller.self.heal.backoff.cap.seconds
+              name: argocd-cmd-params-cm
+              optional: true
+        - name: ARGOCD_APPLICATION_CONTROLLER_SELF_HEAL_BACKOFF_COOLDOWN_SECONDS
+          valueFrom:
+            configMapKeyRef:
+              key: controller.self.heal.backoff.cooldown.seconds
               name: argocd-cmd-params-cm
               optional: true
         - name: ARGOCD_APPLICATION_CONTROLLER_SYNC_TIMEOUT
@@ -312,7 +318,7 @@ spec:
               optional: true
         - name: KUBECACHEDIR
           value: /tmp/kubecache
-        image: quay.io/argoproj/argocd:v3.0.3
+        image: quay.io/argoproj/argocd:v3.0.5
         imagePullPolicy: IfNotPresent
         name: application-controller
         ports:
