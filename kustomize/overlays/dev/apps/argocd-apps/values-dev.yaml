@@ -23,8 +23,6 @@ argocdApplications:
     disable: false
     name: talos
     namespace: talos-system
-    directory:
-      recurse: false
     appCategory: cluster
   omni:
     repoURL: https://github.com/dajrivera/omni-infra.git

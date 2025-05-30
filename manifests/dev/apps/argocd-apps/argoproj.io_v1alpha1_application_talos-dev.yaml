@@ -9,8 +9,6 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    directory:
-      recurse: false
     path: manifests/dev/cluster/talos
     repoURL: https://github.com/dajrivera/k8s-cluster.git
     targetRevision: HEAD
