@@ -69,5 +69,8 @@ patches:
         install:
           extraKernelArgs:
             - ipv6.disable=1
+        kernel:
+          modules:
+            - name: nbd            
 ---
 kind: Workers
