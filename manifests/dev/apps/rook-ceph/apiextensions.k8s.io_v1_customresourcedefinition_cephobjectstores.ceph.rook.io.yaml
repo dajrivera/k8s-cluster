@@ -11,6 +11,8 @@ spec:
     kind: CephObjectStore
     listKind: CephObjectStoreList
     plural: cephobjectstores
+    shortNames:
+    - cephos
     singular: cephobjectstore
   scope: Namespaced
   versions:
