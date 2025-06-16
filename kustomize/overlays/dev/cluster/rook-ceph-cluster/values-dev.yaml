@@ -177,7 +177,8 @@ cephFileSystems:
         failureDomain: host
         replicated:
           size: 1
-        deviceClass: ssd
+        # deviceClass: ssd
+        deviceClass: hdd
       dataPools:
         - failureDomain: host
           replicated:
@@ -220,7 +221,8 @@ cephObjectStores:
         failureDomain: host
         replicated:
           size: 1
-        deviceClass: ssd
+        # deviceClass: ssd
+        deviceClass: hdd
       dataPool:
         failureDomain: host
         replicated:

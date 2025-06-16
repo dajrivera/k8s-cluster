@@ -11,7 +11,7 @@ spec:
     replicated:
       size: 1
   metadataPool:
-    deviceClass: ssd
+    deviceClass: hdd
     failureDomain: host
     replicated:
       size: 1
