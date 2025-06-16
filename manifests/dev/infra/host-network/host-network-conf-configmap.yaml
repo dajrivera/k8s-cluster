@@ -24,5 +24,6 @@ data:
 
     bridge vlan add vid 3000 dev ceph0-port pvid untagged || echo failed to assign vlans to ceph0-port
     bridge vlan add vid 4094 dev net0-port pvid untagged || echo failed to assign vlans to net0-port
+    bridge vlan add vid 1000 dev net1-port pvid untagged || echo failed to assign vlans to net1-port
 
     echo Network configuration setup complete.
