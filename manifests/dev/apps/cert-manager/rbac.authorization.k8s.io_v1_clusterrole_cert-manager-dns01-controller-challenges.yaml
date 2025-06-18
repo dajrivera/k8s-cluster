@@ -9,20 +9,19 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/version: v1.18.1
     helm.sh/chart: cert-manager-v1.18.1
-  name: cert-manager-controller-orders
+  name: cert-manager-dns01-controller-challenges
 rules:
 - apiGroups:
   - acme.cert-manager.io
   resources:
-  - orders
-  - orders/status
+  - challenges
+  - challenges/status
   verbs:
   - update
   - patch
 - apiGroups:
   - acme.cert-manager.io
   resources:
-  - orders
   - challenges
   verbs:
   - get
@@ -31,25 +30,12 @@ rules:
 - apiGroups:
   - cert-manager.io
   resources:
-  - clusterissuers
   - issuers
+  - clusterissuers
   verbs:
   - get
   - list
   - watch
-- apiGroups:
-  - acme.cert-manager.io
-  resources:
-  - challenges
-  verbs:
-  - create
-  - delete
-- apiGroups:
-  - acme.cert-manager.io
-  resources:
-  - orders/finalizers
-  verbs:
-  - update
 - apiGroups:
   - ""
   resources:
@@ -65,3 +51,17 @@ rules:
   verbs:
   - create
   - patch
+- apiGroups:
+  - acme.cert-manager.io
+  resources:
+  - challenges/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch

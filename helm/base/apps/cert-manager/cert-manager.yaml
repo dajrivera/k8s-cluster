@@ -9,5 +9,5 @@ releaseName: cert-manager
 namespace: cert-manager
 includeCRDs: true
 skipHooks: false
-version: 1.17.2
+version: 1.18.1
 valuesFile: values.yaml
