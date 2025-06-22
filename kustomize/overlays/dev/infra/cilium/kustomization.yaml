@@ -4,3 +4,9 @@ resources:
   - ../../../../base/infra/cilium/
 generators:
   - ../../../../../helm/overlays/dev/infra/cilium/
+patches:
+  - target:
+      version: v1
+      kind: Service
+      name: hubble-ui
+    path: hubble-ui-patch.yaml
