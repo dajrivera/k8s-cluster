@@ -43,6 +43,10 @@ spec:
               mountPath: /host/etc/cni/net.d
         - name: install-multus-binary
           image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.1-thick
+          command:
+            - "sh"
+            - "-c"
+            - "cp -f /usr/src/multus-cni/bin/multus-shim /host/opt/cni/bin/multus-shim && cp -f /usr/src/multus-cni/bin/passthru /host/opt/cni/bin/passthru"
           # command:
           #   - "cp"
           #   - "--force"
