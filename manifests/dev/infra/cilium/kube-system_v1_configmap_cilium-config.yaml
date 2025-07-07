@@ -40,17 +40,17 @@ data:
   enable-bpf-masquerade: "true"
   enable-endpoint-health-checking: "true"
   enable-endpoint-lockdown-on-policy-overflow: "false"
-  enable-endpoint-routes: "true"
   enable-envoy-config: "true"
   enable-experimental-lb: "false"
   enable-gateway-api: "true"
-  enable-gateway-api-alpn: "false"
-  enable-gateway-api-app-protocol: "false"
+  enable-gateway-api-alpn: "true"
+  enable-gateway-api-app-protocol: "true"
   enable-gateway-api-proxy-protocol: "false"
   enable-gateway-api-secrets-sync: "true"
   enable-health-check-loadbalancer-ip: "false"
   enable-health-check-nodeport: "true"
   enable-health-checking: "true"
+  enable-host-legacy-routing: "true"
   enable-hubble: "true"
   enable-internal-traffic-policy: "true"
   enable-ipv4: "true"
@@ -70,6 +70,7 @@ data:
   enable-metrics: "true"
   enable-node-selector-labels: "false"
   enable-non-default-deny-policies: "true"
+  enable-pmtu-discovery: "true"
   enable-policy: default
   enable-policy-secrets-sync: "true"
   enable-runtime-device-detection: "true"
@@ -84,6 +85,7 @@ data:
   envoy-base-id: "0"
   envoy-config-retry-interval: 15s
   envoy-keep-cap-netbindservice: "true"
+  envoy-secrets-namespace: cilium-secrets
   external-envoy-proxy: "true"
   gateway-api-hostnetwork-enabled: "true"
   gateway-api-hostnetwork-nodelabelselector: ""
@@ -126,7 +128,7 @@ data:
   nodes-gc-interval: 5m0s
   operator-api-serve-addr: 127.0.0.1:9234
   operator-prometheus-serve-addr: :9963
-  policy-cidr-match-mode: ""
+  policy-cidr-match-mode: nodes
   policy-secrets-namespace: cilium-secrets
   policy-secrets-only-from-secrets-namespace: "true"
   preallocate-bpf-maps: "false"

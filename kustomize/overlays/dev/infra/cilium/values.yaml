@@ -38,15 +38,21 @@ l2announcements:
 operator:
   replicas: 1
 endpointRoutes:
+  enabled: false
+pmtuDiscovery:
   enabled: true
 bpf:
   datapathMode: netkit
   masquerade: true
   vlanBypass:
     - 0
-#  hostLegacyRouting: true
+  hostLegacyRouting: true
+envoyConfig:
+  enabled: true
 gatewayAPI:
   enabled: true
+  enableAlpn: true
+  enableAppProtocol: true
   hostNetwork:
     enabled: true
 #clustermesh:
@@ -73,3 +79,4 @@ envoy:
         - SYS_ADMIN
         - NET_BIND_SERVICE
 devices: br-ext
+policyCIDRMatchMode: nodes

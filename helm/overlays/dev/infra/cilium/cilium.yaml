@@ -2,4 +2,4 @@ apiVersion: builtin
 kind: HelmChartInflationGenerator
 metadata:
   name: cilium
-valuesFile: values-dev.yaml
+valuesFile: values.yaml
