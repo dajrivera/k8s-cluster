@@ -88,7 +88,7 @@ spec:
             secretKeyRef:
               key: ceph-username
               name: rook-ceph-mon
-        image: quay.io/ceph/ceph:v19.2.2
+        image: quay.io/ceph/ceph:v19.2.3
         imagePullPolicy: IfNotPresent
         name: rook-ceph-tools
         resources:
