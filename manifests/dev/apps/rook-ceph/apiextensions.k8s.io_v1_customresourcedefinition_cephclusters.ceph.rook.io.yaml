@@ -238,6 +238,11 @@ spec:
                         description: Enables read affinity for CSI driver.
                         type: boolean
                     type: object
+                  skipUserCreation:
+                    description: |-
+                      SkipUserCreation determines whether CSI users and their associated secrets should be skipped.
+                      If set to true, the user must manually manage these secrets.
+                    type: boolean
                 type: object
               dashboard:
                 description: Dashboard settings
@@ -1537,6 +1542,12 @@ spec:
                   exporter:
                     description: Ceph exporter configuration
                     properties:
+                      hostNetwork:
+                        description: Whether host networking is enabled for CephExporter.
+                          If not set, the network settings from CephCluster.spec.networking
+                          will be applied.
+                        nullable: true
+                        type: boolean
                       perfCountersPrioLimit:
                         default: 5
                         description: Only performance counters greater than or equal
