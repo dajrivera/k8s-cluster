@@ -11,7 +11,7 @@ spec:
       priorityClassName: system-node-critical
       containers:
         - name: kube-multus
-          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.1-thick
+          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.2-thick
           resources:
             $patch: delete # prevent OOM kill on startup
           lifecycle:
@@ -26,7 +26,7 @@ spec:
               mountPath: /tmp/multus
       initContainers:
         - name: remove-multusconf-persistence # workaround, see multus-cni#1391
-          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.1-thick
+          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.2-thick
           command:
             - "/bin/sh"
             - "-c"
@@ -42,7 +42,7 @@ spec:
             - name: cni
               mountPath: /host/etc/cni/net.d
         - name: install-multus-binary
-          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.1-thick
+          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.2-thick
           command:
             - "sh"
             - "-c"
