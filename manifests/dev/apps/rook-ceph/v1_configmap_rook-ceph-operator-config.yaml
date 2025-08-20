@@ -68,6 +68,7 @@ data:
         limits:
           memory: 256Mi
   CSI_ENABLE_CEPHFS_SNAPSHOTTER: "true"
+  CSI_ENABLE_CROSS_NAMESPACE_VOLUME_DATA_SOURCE: "false"
   CSI_ENABLE_CSIADDONS: "false"
   CSI_ENABLE_ENCRYPTION: "false"
   CSI_ENABLE_HOST_NETWORK: "true"
