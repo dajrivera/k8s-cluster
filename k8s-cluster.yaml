@@ -1,5 +1,5 @@
 kind: Cluster
-name: k8s-homelab
+name: k8s-dev
 kubernetes:
   version: v1.34.1
 talos:
@@ -60,7 +60,7 @@ patches:
 ---
 kind: ControlPlane
 machineClass:
-  name: homelab
+  name: dev
   size: 1
 patches:
   - name: machinepatch
@@ -74,3 +74,6 @@ patches:
             - name: nbd            
 ---
 kind: Workers
+machineClass:
+  name: dev
+  size: 0
