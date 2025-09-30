@@ -122,7 +122,8 @@ cephBlockPools:
       failureDomain: host
       replicated:
         size: 1
-      deviceClass: hdd
+      # deviceClass: hdd
+      deviceClass: ssd
     storageClass:
       enabled: true
       name: ceph-block
@@ -178,14 +179,15 @@ cephFileSystems:
         failureDomain: host
         replicated:
           size: 1
-        # deviceClass: ssd
-        deviceClass: hdd
+        # deviceClass: hdd
+        deviceClass: ssd
       dataPools:
         - failureDomain: host
           replicated:
             size: 1
           name: data0
-          deviceClass: hdd
+          # deviceClass: hdd
+          deviceClass: ssd
       metadataServer:
         activeCount: 1
         activeStandby: true
@@ -222,15 +224,16 @@ cephObjectStores:
         failureDomain: host
         replicated:
           size: 1
-        # deviceClass: ssd
-        deviceClass: hdd
+        # deviceClass: hdd
+        deviceClass: ssd
       dataPool:
         failureDomain: host
         replicated:
           size: 1
         parameters:
           bulk: "true"
-        deviceClass: hdd
+        # deviceClass: hdd
+        deviceClass: ssd
       preservePoolsOnDelete: true
       gateway:
         port: 80
