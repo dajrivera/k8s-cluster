@@ -7,13 +7,13 @@ metadata:
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/version: v0.4.1
     helm.sh/chart: ceph-csi-operator-0.4.1
-  name: ceph-csi-cephfs-ctrlplugin-rb
-  namespace: ceph-csi-operator-system
+  name: ceph-csi-leader-election-rolebinding
+  namespace: rook-ceph
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: ceph-csi-cephfs-ctrlplugin-r
+  name: ceph-csi-leader-election-role
 subjects:
 - kind: ServiceAccount
-  name: ceph-csi-cephfs-ctrlplugin-sa
+  name: ceph-csi-controller-manager
   namespace: rook-ceph
