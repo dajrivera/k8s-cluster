@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/version: v0.4.1
     helm.sh/chart: ceph-csi-operator-0.4.1
   name: ceph-csi-cephfs-ctrlplugin-r
-  namespace: ceph-csi-operator-system
+  namespace: rook-ceph
 rules:
 - apiGroups:
   - coordination.k8s.io

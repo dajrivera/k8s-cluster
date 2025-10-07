@@ -9,7 +9,7 @@ metadata:
     control-plane: controller-manager
     helm.sh/chart: ceph-csi-operator-0.4.1
   name: ceph-csi-controller-manager
-  namespace: ceph-csi-operator-system
+  namespace: rook-ceph
 spec:
   replicas: 1
   selector:
