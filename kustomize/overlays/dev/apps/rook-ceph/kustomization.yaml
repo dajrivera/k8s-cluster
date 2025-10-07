@@ -4,3 +4,7 @@ resources:
   - ../../../../base/apps/rook-ceph/
 generators:
   - ../../../../../helm/overlays/dev/apps/rook-ceph/
+patches:
+  - path: patch-ceph-csi-operator-namespace.yaml
+    target:
+      labelSelector: "helm.sh/chart=ceph-csi-operator-0.4.1"

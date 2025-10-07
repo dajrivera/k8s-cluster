@@ -4,3 +4,10 @@ metadata:
   name: rook-ceph
   labels:
     name: rook-ceph
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ceph-csi-operator-system
+  labels:
+    name: ceph-csi-operator-system

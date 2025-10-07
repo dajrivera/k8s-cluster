@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/created-by: helm
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.17.8
+    helm.sh/chart: rook-ceph-v1.18.3
     operator: rook
     storage-backend: ceph
   name: rook-ceph-system
