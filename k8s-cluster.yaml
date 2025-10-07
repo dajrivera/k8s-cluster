@@ -33,6 +33,8 @@ patches:
         kubelet:
           extraArgs:
             max-pods: "250"
+            shutdownGracePeriod: 300
+            shutdownGracePeriodCriticalPods: 180
           extraConfig:
             featureGates:
               UserNamespacesPodSecurityStandards: true
