@@ -6,5 +6,7 @@ resources:
   - exporter-service-monitor.yaml
   - prometheus.yaml
   - prometheus-service.yaml
+  - bridge-vlan-public-net.yaml
+  - bridge-vlan-cluster-net.yaml  
 generators:
   - ../../../../../helm/overlays/dev/cluster/rook-ceph-cluster/

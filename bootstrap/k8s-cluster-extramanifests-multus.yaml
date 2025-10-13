@@ -1,11 +1,9 @@
 cluster:
   extraManifests:
     - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/infra/multus/apiextensions.k8s.io_v1_customresourcedefinition_network-attachment-definitions.k8s.cni.cncf.io.yaml
-    - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/infra/multus/kube-system_v1_serviceaccount_multus.yaml
+    - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/infra/multus/v1_serviceaccount_multus.yaml
     - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/infra/multus/rbac.authorization.k8s.io_v1_clusterrole_multus.yaml
     - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/infra/multus/rbac.authorization.k8s.io_v1_clusterrolebinding_multus.yaml
-    - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/infra/multus/kube-system_v1_configmap_multus-cni-config.yaml
-    - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/infra/multus/kube-system_v1_configmap_multus-daemon-config.yaml
-    - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/infra/multus/kube-system_apps_v1_daemonset_kube-multus-ds.yaml
-    - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/infra/multus/rook-ceph_k8s.cni.cncf.io_v1_networkattachmentdefinition_cluster-net.yaml
-    - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/infra/multus/rook-ceph_k8s.cni.cncf.io_v1_networkattachmentdefinition_public-net.yaml
+    - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/infra/multus/v1_configmap_multus-cni-config.yaml
+    - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/infra/multus/v1_configmap_multus-daemon-config.yaml
+    - https://raw.githubusercontent.com/dajrivera/k8s-cluster/refs/heads/main/manifests/dev/infra/multus/apps_v1_daemonset_kube-multus-ds.yaml
