@@ -55,6 +55,8 @@ gatewayAPI:
   enableAppProtocol: true
   hostNetwork:
     enabled: true
+  gatewayClass:
+    create: "true"
 #clustermesh:
 #  apiserver:
 #    tls:

@@ -1,4 +1,6 @@
 crds:
   enabled: true
+extraArgs:
+  - --enable-gateway-api
 #startupapicheck:
 #  enabled: false
