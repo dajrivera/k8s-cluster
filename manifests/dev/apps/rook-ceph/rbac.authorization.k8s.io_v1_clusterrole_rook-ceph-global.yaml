@@ -3,9 +3,12 @@ kind: ClusterRole
 metadata:
   labels:
     app.kubernetes.io/created-by: helm
+    app.kubernetes.io/instance: rook-ceph
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    helm.sh/chart: rook-ceph-v1.18.3
+    app.kubernetes.io/version: v1.18.6
+    helm.sh/chart: rook-ceph-v1.18.6
     operator: rook
     storage-backend: ceph
   name: rook-ceph-global
