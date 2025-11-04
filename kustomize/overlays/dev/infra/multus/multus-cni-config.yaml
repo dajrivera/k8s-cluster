@@ -10,7 +10,7 @@ data:
   00-multus.conf: |
     {
         "cniVersion": "0.3.1",
-        "logLevel": "debug",
+        "logLevel": "verbose",
         "logToStderr": true,
         "name": "multus-cni-network",
         "clusterNetwork": "/host/etc/cni/net.d/05-cilium.conflist",
