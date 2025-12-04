@@ -12,7 +12,7 @@ spec:
       omni-kube-service-exposer.sidero.dev/prefix: cephdash
   cephVersion:
     allowUnsupported: false
-    image: quay.io/ceph/ceph:v19.2.3
+    image: quay.io/ceph/ceph:v20.2.0
   cleanupPolicy:
     allowUninstallWithVolumes: false
     confirmation: ""

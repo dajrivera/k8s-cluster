@@ -9,4 +9,4 @@ releaseName: rook-ceph-cluster
 namespace: rook-ceph
 includeCRDs: true
 skipHooks: false
-version: 1.18.8
+version: 1.18.7
