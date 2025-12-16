@@ -41,8 +41,8 @@ patches:
             max-pods: "250"
             feature-gates: UserNamespacesSupport=true,UserNamespacesPodSecurityStandards=true,ImageVolume=true
           extraConfig:
-            shutdownGracePeriod: "300s"
-            shutdownGracePeriodCriticalPods: "180s"
+            shutdownGracePeriod: "600s"
+            shutdownGracePeriodCriticalPods: "120s"
         registries:
           config:
             git.somostechs.com:
