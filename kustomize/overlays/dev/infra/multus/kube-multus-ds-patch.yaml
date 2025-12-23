@@ -11,7 +11,7 @@ spec:
       priorityClassName: system-node-critical
       containers:
         - name: kube-multus
-          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.3-thick
+          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.2-thick
           resources:
             $patch: delete # prevent OOM kill on startup
           lifecycle:
@@ -26,7 +26,7 @@ spec:
               mountPath: /tmp/multus
       initContainers:
         - name: remove-multusconf-persistence # workaround, see multus-cni#1391
-          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.3-thick
+          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.2-thick
           command:
             - "/bin/sh"
             - "-c"
@@ -42,11 +42,26 @@ spec:
             - name: cni
               mountPath: /host/etc/cni/net.d
         - name: install-multus-binary
-          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.3-thick
+          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.2-thick
+          command:
+            - "sh"
+            - "-c"
+            - "cp -f /usr/src/multus-cni/bin/multus-shim /host/opt/cni/bin/multus-shim && cp -f /usr/src/multus-cni/bin/passthru /host/opt/cni/bin/passthru"
+          # command:
+          #   - "cp"
+          #   - "--force"
+          #   - "/usr/src/multus-cni/bin/multus-shim"
+          #   - "/host/opt/cni/bin/multus-shim"
+        # - name: install-cni
+        #   image: ghcr.io/siderolabs/install-cni:v1.10.0  # adapt to your talos major version
         #   command:
-        #     - "sh"
-        #     - "-c"
-        #     - "cp -f /usr/src/multus-cni/bin/multus-shim /host/opt/cni/bin/multus-shim && cp -f /usr/src/multus-cni/bin/passthru /host/opt/cni/bin/passthru"
+        #   - /install-cni.sh          
+        #   securityContext:
+        #     privileged: true
+        #   volumeMounts:
+        #   - mountPath: /host/opt/cni/bin
+        #     mountPropagation: Bidirectional
+        #     name: cnibin
       volumes:
         - name: multus-cni-config
           configMap:

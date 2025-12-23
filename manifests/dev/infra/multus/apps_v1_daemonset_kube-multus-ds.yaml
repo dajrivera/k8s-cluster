@@ -26,7 +26,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-        image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.3-thick
+        image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.2-thick
         lifecycle:
           preStop:
             exec:
@@ -72,7 +72,7 @@ spec:
         - /bin/sh
         - -c
         - chattr -f -i /host/etc/cni/net.d/00-multus.conf || exit 0
-        image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.3-thick
+        image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.2-thick
         name: remove-multusconf-persistence
         resources:
           requests:
@@ -85,12 +85,11 @@ spec:
         - mountPath: /host/etc/cni/net.d
           name: cni
       - command:
-        - /usr/src/multus-cni/bin/install_multus
-        - -d
-        - /host/opt/cni/bin
-        - -t
-        - thick
-        image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.3-thick
+        - sh
+        - -c
+        - cp -f /usr/src/multus-cni/bin/multus-shim /host/opt/cni/bin/multus-shim
+          && cp -f /usr/src/multus-cni/bin/passthru /host/opt/cni/bin/passthru
+        image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.2.2-thick
         name: install-multus-binary
         resources:
           requests:
