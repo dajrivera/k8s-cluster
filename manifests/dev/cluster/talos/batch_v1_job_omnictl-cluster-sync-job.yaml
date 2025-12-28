@@ -28,7 +28,7 @@ spec:
             secretKeyRef:
               key: omniServiceAccountKey
               name: omni-api-key
-        image: ghcr.io/dajrivera/omnictl:v0.50.0
+        image: ghcr.io/dajrivera/omnictl:v1.4.6
         name: cluster-template-sync
         securityContext:
           allowPrivilegeEscalation: false
@@ -53,7 +53,7 @@ spec:
         env:
         - name: HOME
           value: /omni
-        image: docker.io/alpine/git:v2.47.2
+        image: docker.io/alpine/git:v2.52.0
         name: clone-source-repo
         securityContext:
           allowPrivilegeEscalation: false

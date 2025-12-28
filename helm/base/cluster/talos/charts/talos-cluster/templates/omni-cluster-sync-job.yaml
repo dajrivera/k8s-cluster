@@ -16,7 +16,7 @@ spec:
         fsGroupChangePolicy: "Always"      
       initContainers:
       - name: clone-source-repo
-        image: docker.io/alpine/git:v2.47.2
+        image: docker.io/alpine/git:v2.52.0
         env:
         - name: HOME
           value: /omni
@@ -42,7 +42,7 @@ spec:
           name: omni
       containers:
       - name: cluster-template-sync
-        image: ghcr.io/dajrivera/omnictl:v0.50.0
+        image: ghcr.io/dajrivera/omnictl:v1.4.6
         env:
         - name: OMNI_ENDPOINT
           valueFrom:
