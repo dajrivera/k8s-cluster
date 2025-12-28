@@ -42,6 +42,7 @@ spec:
         volumeMounts:
         - mountPath: /omni
           name: omni
+        workingDir: /omni
       initContainers:
       - args:
         - git clone -n --depth=1 --filter=tree:0 https://github.com/dajrivera/k8s-cluster.git

@@ -63,6 +63,7 @@ spec:
           capabilities:
             drop:
               - ALL
+        workingDir: /omni
         command: ["/bin/sh","-c"]
         args:
           - >-
