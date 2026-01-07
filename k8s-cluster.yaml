@@ -21,13 +21,13 @@ patches:
                   namespaces:
                     - rook-ceph
           extraArgs:
-            feature-gates: UserNamespacesSupport=true,UserNamespacesPodSecurityStandards=true,ImageVolume=true
+            feature-gates: UserNamespacesHostNetworkSupport=true,ImageVolume=true
         controllerManager:
           extraArgs:
-            feature-gates: UserNamespacesSupport=true,UserNamespacesPodSecurityStandards=true,ImageVolume=true
+            feature-gates: UserNamespacesHostNetworkSupport=true,ImageVolume=true
         scheduler:
           extraArgs:
-            feature-gates: UserNamespacesSupport=true,UserNamespacesPodSecurityStandards=true,ImageVolume=true
+            feature-gates: UserNamespacesHostNetworkSupport=true,ImageVolume=true
         network:
           cni:
             name: none
@@ -39,7 +39,7 @@ patches:
         kubelet:
           extraArgs:
             max-pods: "250"
-            feature-gates: UserNamespacesSupport=true,UserNamespacesPodSecurityStandards=true,ImageVolume=true
+            feature-gates: UserNamespacesHostNetworkSupport=true,ImageVolume=true
           extraConfig:
             shutdownGracePeriod: "600s"
             shutdownGracePeriodCriticalPods: "120s"
