@@ -72,7 +72,7 @@ spec:
       cluster: cluster-net
       public: public-net
   priorityClassNames:
-    mgr: system-cluster-critical
+    mgr: system-node-critical
     mon: system-node-critical
     osd: system-node-critical
   removeOSDsIfOutAndSafeToRemove: false

@@ -21,7 +21,7 @@ spec:
           cpu: null
           memory: 40Mi
     port: 80
-    priorityClassName: system-cluster-critical
+    priorityClassName: system-node-critical
     resources:
       limits:
         memory: 2Gi

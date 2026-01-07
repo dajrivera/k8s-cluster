@@ -125,7 +125,7 @@ cephClusterSpec:
   priorityClassNames:
     mon: system-node-critical
     osd: system-node-critical
-    mgr: system-cluster-critical      
+    mgr: system-node-critical
 cephBlockPools:
   - name: ceph-blockpool
     spec:
@@ -207,7 +207,7 @@ cephFileSystems:
           requests:
             cpu: null
             memory: "4Gi"
-        priorityClassName: system-cluster-critical
+        priorityClassName: system-node-critical
     storageClass:
       enabled: true
       isDefault: false
@@ -254,7 +254,7 @@ cephObjectStores:
             cpu: null
             memory: "1Gi"
         instances: 1
-        priorityClassName: system-cluster-critical
+        priorityClassName: system-node-critical
         opsLogSidecar:
           resources:
             limits:
