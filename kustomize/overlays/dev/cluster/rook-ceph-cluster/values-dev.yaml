@@ -16,17 +16,13 @@ monitoring:
   createPrometheusRules: true
 # Specify these values to override the Ceph image in the cephClusterSpec below.
 # If specifying these values, do not include the cephVersion section in the cephClusterSpec.
-# Only avaialable in main branch
-# cephImage:
-#   repository: quay.io/ceph/ceph
-#   tag: v20.2.0
-#   allowUnsupported: false
-#   imagePullPolicy: IfNotPresent
+cephImage:
+  repository: quay.io/ceph/ceph
+  tag: v20.2.0
+  allowUnsupported: false
+  imagePullPolicy: IfNotPresent
 cephClusterSpec:
   # For more details, check https://rook.io/docs/rook/v1.10/CRDs/Cluster/ceph-cluster-crd/
-  cephVersion:
-    image: quay.io/ceph/ceph:v20.2.0
-    allowUnsupported: false
   mon:
     count: 1
   mgr:
