@@ -3,7 +3,7 @@ name: k8s-dev
 kubernetes:
   version: v1.35.0
 talos:
-  version: v1.12.1
+  version: v1.12.2
 features:
   diskEncryption: true
   enableWorkloadProxy: true
