@@ -3,10 +3,10 @@ kind: HelmChartInflationGenerator
 metadata:
   name: gateway-api-crds
 name: gateway-api-crds
-repo: https://charts.portefaix.xyz/
+repo: https://wiremind.github.io/wiremind-helm-charts
 chartHome: ../../../../../charts
 releaseName: gateway-api-crds
 namespace: kube-system
 includeCRDs: true
 skipHooks: false
-version: 1.2.1
+version: 1.4.0

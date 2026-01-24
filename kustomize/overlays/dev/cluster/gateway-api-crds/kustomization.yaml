@@ -4,3 +4,10 @@ resources:
   - ../../../../base/cluster/gateway-api-crds/
 generators:
   - ../../../../../helm/overlays/dev/cluster/gateway-api-crds/
+patches:
+- target:
+    kind: CustomResourceDefinition
+  patch: |-
+    - op: add
+      path: /metadata/annotations/argocd.argoproj.io~1sync-options
+      value: Replace=true
