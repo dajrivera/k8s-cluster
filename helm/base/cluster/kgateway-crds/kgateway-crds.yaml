@@ -1,0 +1,12 @@
+apiVersion: builtin
+kind: HelmChartInflationGenerator
+metadata:
+  name: kgateway-crds
+name: kgateway-crds
+repo: oci://cr.kgateway.dev/kgateway-dev/charts
+chartHome: ../../../../../charts
+releaseName: kgateway-crds
+namespace: kgateway-system
+includeCRDs: true
+skipHooks: false
+version: v2.1.2

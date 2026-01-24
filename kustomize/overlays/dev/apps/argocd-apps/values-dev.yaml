@@ -93,3 +93,13 @@ argocdApplications:
     name: cert-manager
     namespace: cert-manager
     appCategory: apps
+  kgateway-crds:
+    disableAutomated: false
+    disable: false
+    name: kgateway-crds
+    appCategory: cluster
+  kgateway:
+    disableAutomated: false
+    disable: false
+    name: kgateway
+    appCategory: cluster
