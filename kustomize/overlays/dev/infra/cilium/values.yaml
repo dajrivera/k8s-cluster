@@ -49,14 +49,14 @@ bpf:
   hostLegacyRouting: true
 envoyConfig:
   enabled: true
-gatewayAPI:
-  enabled: true
-  enableAlpn: true
-  enableAppProtocol: true
-  hostNetwork:
-    enabled: true
-  gatewayClass:
-    create: "true"
+# gatewayAPI:
+#   enabled: true
+#   enableAlpn: true
+#   enableAppProtocol: true
+#   hostNetwork:
+#     enabled: true
+#   gatewayClass:
+#     create: "true"
 #clustermesh:
 #  apiserver:
 #    tls:
