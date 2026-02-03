@@ -4,7 +4,7 @@ kind: StorageClass
 metadata:
   annotations:
     storageclass.kubernetes.io/is-default-class: "false"
-  name: ceph-block-fast
+  name: ceph-block-bulk
 parameters:
   clusterID: rook-ceph
   csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
@@ -16,7 +16,7 @@ parameters:
   csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
   imageFeatures: layering
   imageFormat: "2"
-  pool: ceph-blockpool-fast
+  pool: ceph-blockpool-bulk
 provisioner: rook-ceph.rbd.csi.ceph.com
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
