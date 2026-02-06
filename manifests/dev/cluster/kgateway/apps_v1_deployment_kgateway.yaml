@@ -5,8 +5,8 @@ metadata:
     app.kubernetes.io/instance: kgateway
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kgateway
-    app.kubernetes.io/version: 1.16.0
-    helm.sh/chart: kgateway-v2.1.2
+    app.kubernetes.io/version: v2.2.0
+    helm.sh/chart: kgateway-v2.2.0
     kgateway: kgateway
   name: kgateway
   namespace: kgateway-system
@@ -46,12 +46,10 @@ spec:
           value: kgateway
         - name: KGW_XDS_SERVICE_PORT
           value: "9977"
-        - name: KGW_AGENTGATEWAY_XDS_SERVICE_PORT
-          value: "9978"
         - name: KGW_DEFAULT_IMAGE_REGISTRY
           value: cr.kgateway.dev/kgateway-dev
         - name: KGW_DEFAULT_IMAGE_TAG
-          value: v2.1.2
+          value: v2.2.0
         - name: KGW_DEFAULT_IMAGE_PULL_POLICY
           value: IfNotPresent
         - name: KGW_DISCOVERY_NAMESPACE_SELECTORS
@@ -60,19 +58,22 @@ spec:
           value: '{}'
         - name: KGW_VALIDATION_MODE
           value: standard
+        - name: KGW_ENABLE_AGENTGATEWAY
+          value: "false"
+        - name: KGW_ENABLE_ENVOY
+          value: "true"
+        - name: KGW_GATEWAY_CLASS_PARAMETERS_REFS
+          value: '{}'
         - name: POD_NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: cr.kgateway.dev/kgateway-dev/kgateway:v2.1.2
+        image: cr.kgateway.dev/kgateway-dev/kgateway:v2.2.0
         imagePullPolicy: IfNotPresent
-        name: kgateway
+        name: controller
         ports:
         - containerPort: 9977
           name: grpc-xds
-          protocol: TCP
-        - containerPort: 9978
-          name: grpc-xds-agw
           protocol: TCP
         - containerPort: 9093
           name: health
@@ -84,7 +85,14 @@ spec:
           httpGet:
             path: /readyz
             port: 9093
-          initialDelaySeconds: 3
+          initialDelaySeconds: 1
           periodSeconds: 10
         resources: {}
+        startupProbe:
+          failureThreshold: 120
+          httpGet:
+            path: /readyz
+            port: 9093
+          initialDelaySeconds: 0
+          periodSeconds: 1
       serviceAccountName: kgateway

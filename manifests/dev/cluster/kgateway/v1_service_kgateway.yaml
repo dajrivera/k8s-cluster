@@ -5,8 +5,8 @@ metadata:
     app.kubernetes.io/instance: kgateway
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kgateway
-    app.kubernetes.io/version: 1.16.0
-    helm.sh/chart: kgateway-v2.1.2
+    app.kubernetes.io/version: v2.2.0
+    helm.sh/chart: kgateway-v2.2.0
     kgateway: kgateway
   name: kgateway
   namespace: kgateway-system
@@ -16,10 +16,6 @@ spec:
     port: 9977
     protocol: TCP
     targetPort: 9977
-  - name: grpc-xds-agw
-    port: 9978
-    protocol: TCP
-    targetPort: 9978
   selector:
     app.kubernetes.io/instance: kgateway
     app.kubernetes.io/name: kgateway
