@@ -4,6 +4,9 @@ data:
     [global]
     osd_pool_default_size = 1
     mon_warn_on_pool_no_redundancy = false
+
+    [mon]
+    mon_data_avail_warn = 15
 kind: ConfigMap
 metadata:
   name: rook-config-override
