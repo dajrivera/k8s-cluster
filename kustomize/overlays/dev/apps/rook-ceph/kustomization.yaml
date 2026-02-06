@@ -5,12 +5,7 @@ resources:
 generators:
   - ../../../../../helm/overlays/dev/apps/rook-ceph/
 patches:
-# - target:
-#     labelSelector: "helm.sh/chart=ceph-csi-operator-0.4.1"
-#   path: patch-ceph-csi-operator-namespace.yaml
-  # fix large crds that fail kubectl apply
 - target:
-    labelSelector: "helm.sh/chart=ceph-csi-operator-0.4.1"
     kind: CustomResourceDefinition
   patch: |-
     - op: add
