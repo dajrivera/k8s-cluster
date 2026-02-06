@@ -7,8 +7,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.19.0
-    helm.sh/chart: rook-ceph-v1.19.0
+    app.kubernetes.io/version: v1.19.1
+    helm.sh/chart: rook-ceph-v1.19.1
     operator: rook
     storage-backend: ceph
   name: rook-ceph-object-bucket

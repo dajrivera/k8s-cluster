@@ -9,4 +9,4 @@ releaseName: rook-ceph
 namespace: rook-ceph
 includeCRDs: true
 skipHooks: false
-version: 1.19.0
+version: 1.19.1

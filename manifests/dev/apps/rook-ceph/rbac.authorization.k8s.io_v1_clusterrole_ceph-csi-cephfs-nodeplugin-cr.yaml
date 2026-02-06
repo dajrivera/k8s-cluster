@@ -5,10 +5,9 @@ metadata:
     app.kubernetes.io/instance: rook-ceph
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: ceph-csi
-    app.kubernetes.io/version: v0.4.1
-    helm.sh/chart: ceph-csi-operator-0.4.1
+    app.kubernetes.io/version: v0.5.0
+    helm.sh/chart: ceph-csi-operator-0.5.0
   name: ceph-csi-cephfs-nodeplugin-cr
-  namespace: rook-ceph
 rules:
 - apiGroups:
   - ""
@@ -22,6 +21,8 @@ rules:
   - secrets
   verbs:
   - get
+  - list
+  - watch
 - apiGroups:
   - ""
   resources:
@@ -57,3 +58,9 @@ rules:
   - persistentvolumeclaims
   verbs:
   - get
+- apiGroups:
+  - authentication.k8s.io
+  resources:
+  - tokenreviews
+  verbs:
+  - create
