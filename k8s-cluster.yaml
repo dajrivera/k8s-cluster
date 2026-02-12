@@ -1,7 +1,7 @@
 kind: Cluster
 name: k8s-dev
 kubernetes:
-  version: v1.35.0
+  version: v1.35.1
 talos:
   version: v1.12.3
 features:
