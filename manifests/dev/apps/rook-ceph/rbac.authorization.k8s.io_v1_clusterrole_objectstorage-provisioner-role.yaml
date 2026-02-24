@@ -46,3 +46,11 @@ rules:
   - delete
   - update
   - create
+- apiGroups:
+  - events.k8s.io
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update

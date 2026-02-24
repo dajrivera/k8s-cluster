@@ -7,8 +7,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/version: v1.19.1
-    helm.sh/chart: rook-ceph-v1.19.1
+    app.kubernetes.io/version: v1.19.2
+    helm.sh/chart: rook-ceph-v1.19.2
     operator: rook
     storage-backend: ceph
   name: rook-ceph-mgr-cluster
@@ -33,6 +33,14 @@ rules:
   - list
   - get
   - watch
+- apiGroups:
+  - events.k8s.io
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
 - apiGroups:
   - storage.k8s.io
   resources:
