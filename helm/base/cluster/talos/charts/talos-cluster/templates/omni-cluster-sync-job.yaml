@@ -11,9 +11,13 @@ spec:
   completions: 1
   template:
     spec:
+      tolerations:
+      - key: "node.kubernetes.io/unschedulable"
+        operator: "Exists"
+        effect: "NoSchedule"
       securityContext:
         fsGroup: 65534
-        fsGroupChangePolicy: "OnRootMismatch"      
+        fsGroupChangePolicy: "OnRootMismatch"
       initContainers:
       - name: clone-source-repo
         image: docker.io/alpine/git:v2.52.0
