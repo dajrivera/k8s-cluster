@@ -2,9 +2,9 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/3328
+    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/4530
     argocd.argoproj.io/sync-options: Replace=true
-    gateway.networking.k8s.io/bundle-version: v1.4.0
+    gateway.networking.k8s.io/bundle-version: v1.5.1
     gateway.networking.k8s.io/channel: experimental
   name: httproutes.gateway.networking.k8s.io
 spec:
@@ -484,7 +484,7 @@ spec:
                                         AllowHeaders indicates which HTTP request headers are supported for
                                         accessing the requested resource.
 
-                                        Header names are not case sensitive.
+                                        Header names are not case-sensitive.
 
                                         Multiple header names in the value of the `Access-Control-Allow-Headers`
                                         response header are separated by a comma (",").
@@ -503,18 +503,21 @@ spec:
                                         client side.
 
                                         A wildcard indicates that the requests with all HTTP headers are allowed.
-                                        The `Access-Control-Allow-Headers` response header can only use `*`
-                                        wildcard as value when the `AllowCredentials` field is false or omitted.
+                                        If config contains the wildcard "*" in allowHeaders and the request is
+                                        not credentialed, the `Access-Control-Allow-Headers` response header
+                                        can either use the `*` wildcard or the value of
+                                        Access-Control-Request-Headers from the request.
 
-                                        When the `AllowCredentials` field is true and `AllowHeaders` field
-                                        specified with the `*` wildcard, the gateway must specify one or more
+                                        When the request is credentialed, the gateway must not specify the `*`
+                                        wildcard in the `Access-Control-Allow-Headers` response header. When
+                                        also the `AllowCredentials` field is true and `AllowHeaders` field
+                                        is specified with the `*` wildcard, the gateway must specify one or more
                                         HTTP headers in the value of the `Access-Control-Allow-Headers` response
                                         header. The value of the header `Access-Control-Allow-Headers` is same as
                                         the `Access-Control-Request-Headers` header provided by the client. If
                                         the header `Access-Control-Request-Headers` is not included in the
                                         request, the gateway will omit the `Access-Control-Allow-Headers`
-                                        response header, instead of specifying the `*` wildcard. A Gateway
-                                        implementation may choose to add implementation-specific default headers.
+                                        response header, instead of specifying the `*` wildcard.
 
                                         Support: Extended
                                       items:
@@ -538,6 +541,10 @@ spec:
                                       maxItems: 64
                                       type: array
                                       x-kubernetes-list-type: set
+                                      x-kubernetes-validations:
+                                      - message: AllowHeaders cannot contain '*' alongside
+                                          other methods
+                                        rule: '!(''*'' in self && self.size() > 1)'
                                     allowMethods:
                                       description: |-
                                         AllowMethods indicates which HTTP methods are supported for accessing the
@@ -546,7 +553,7 @@ spec:
                                         Valid values are any method defined by RFC9110, along with the special
                                         value `*`, which represents all HTTP methods are allowed.
 
-                                        Method names are case sensitive, so these values are also case-sensitive.
+                                        Method names are case-sensitive, so these values are also case-sensitive.
                                         (See https://www.rfc-editor.org/rfc/rfc2616#section-5.1.1)
 
                                         Multiple method names in the value of the `Access-Control-Allow-Methods`
@@ -566,18 +573,21 @@ spec:
                                         `Access-Control-Allow-Methods`, it will present an error on the client
                                         side.
 
-                                        The `Access-Control-Allow-Methods` response header can only use `*`
-                                        wildcard as value when the `AllowCredentials` field is false or omitted.
+                                        If config contains the wildcard "*" in allowMethods and the request is
+                                        not credentialed, the `Access-Control-Allow-Methods` response header
+                                        can either use the `*` wildcard or the value of
+                                        Access-Control-Request-Method from the request.
 
-                                        When the `AllowCredentials` field is true and `AllowMethods` field
+                                        When the request is credentialed, the gateway must not specify the `*`
+                                        wildcard in the `Access-Control-Allow-Methods` response header. When
+                                        also the `AllowCredentials` field is true and `AllowMethods` field
                                         specified with the `*` wildcard, the gateway must specify one HTTP method
                                         in the value of the Access-Control-Allow-Methods response header. The
                                         value of the header `Access-Control-Allow-Methods` is same as the
                                         `Access-Control-Request-Method` header provided by the client. If the
                                         header `Access-Control-Request-Method` is not included in the request,
                                         the gateway will omit the `Access-Control-Allow-Methods` response header,
-                                        instead of specifying the `*` wildcard. A Gateway implementation may
-                                        choose to add implementation-specific default methods.
+                                        instead of specifying the `*` wildcard.
 
                                         Support: Extended
                                       items:
@@ -644,10 +654,19 @@ spec:
                                         the CORS headers. The cross-origin request fails on the client side.
                                         Therefore, the client doesn't attempt the actual cross-origin request.
 
-                                        The `Access-Control-Allow-Origin` response header can only use `*`
-                                        wildcard as value when the `AllowCredentials` field is false or omitted.
+                                        Conversely, if the request `Origin` matches one of the configured
+                                        allowed origins, the gateway sets the response header
+                                        `Access-Control-Allow-Origin` to the same value as the `Origin`
+                                        header provided by the client.
 
-                                        When the `AllowCredentials` field is true and `AllowOrigins` field
+                                        When config has the wildcard ("*") in allowOrigins, and the request
+                                        is not credentialed (e.g., it is a preflight request), the
+                                        `Access-Control-Allow-Origin` response header either contains the
+                                        wildcard as well or the Origin from the request.
+
+                                        When the request is credentialed, the gateway must not specify the `*`
+                                        wildcard in the `Access-Control-Allow-Origin` response header. When
+                                        also the `AllowCredentials` field is true and `AllowOrigins` field
                                         specified with the `*` wildcard, the gateway must return a single origin
                                         in the value of the `Access-Control-Allow-Origin` response header,
                                         instead of specifying the `*` wildcard. The value of the header
@@ -659,12 +678,12 @@ spec:
                                         description: |-
                                           The CORSOrigin MUST NOT be a relative URI, and it MUST follow the URI syntax and
                                           encoding rules specified in RFC3986.  The CORSOrigin MUST include both a
-                                          scheme (e.g., "http" or "spiffe") and a scheme-specific-part, or it should be a single '*' character.
+                                          scheme ("http" or "https") and a scheme-specific-part, or it should be a single '*' character.
                                           URIs that include an authority MUST include a fully qualified domain name or
                                           IP address as the host.
                                         maxLength: 253
                                         minLength: 1
-                                        pattern: (^\*$)|(^([a-zA-Z][a-zA-Z0-9+\-.]+):\/\/([^:/?#]+)(:([0-9]{1,5}))?$)
+                                        pattern: (^\*$)|(^(http(s)?):\/\/(((\*\.)?([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9-]+|\*)(:([0-9]{1,5}))?)$)
                                         type: string
                                       maxItems: 64
                                       type: array
@@ -695,14 +714,18 @@ spec:
                                         this additional header will be exposed as part of the response to the
                                         client.
 
-                                        Header names are not case sensitive.
+                                        Header names are not case-sensitive.
 
                                         Multiple header names in the value of the `Access-Control-Expose-Headers`
                                         response header are separated by a comma (",").
 
                                         A wildcard indicates that the responses with all HTTP headers are exposed
                                         to clients. The `Access-Control-Expose-Headers` response header can only
-                                        use `*` wildcard as value when the `AllowCredentials` field is false or omitted.
+                                        use `*` wildcard as value when the request is not credentialed.
+
+                                        When the `exposeHeaders` config field contains the "*" wildcard and
+                                        the request is credentialed, the gateway cannot use the `*` wildcard in
+                                        the `Access-Control-Expose-Headers` response header.
 
                                         Support: Extended
                                       items:
@@ -738,6 +761,9 @@ spec:
 
                                         The default value of `Access-Control-Max-Age` response header is 5
                                         (seconds).
+
+                                        When the `MaxAge` field is unspecified, the gateway sets the response
+                                        header "Access-Control-Max-Age: 5" by default.
                                       format: int32
                                       minimum: 1
                                       type: integer
@@ -916,6 +942,7 @@ spec:
                                             If the list has entries, only those entries must be sent.
                                           items:
                                             type: string
+                                          maxItems: 64
                                           type: array
                                           x-kubernetes-list-type: set
                                       type: object
@@ -954,6 +981,7 @@ spec:
                                             request must be set to the actual number of bytes forwarded.
                                           items:
                                             type: string
+                                          maxItems: 64
                                           type: array
                                           x-kubernetes-list-type: set
                                         allowedResponseHeaders:
@@ -965,6 +993,7 @@ spec:
                                             except Authority or Host must be copied.
                                           items:
                                             type: string
+                                          maxItems: 64
                                           type: array
                                           x-kubernetes-list-type: set
                                         path:
@@ -1069,10 +1098,14 @@ spec:
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
-                                            description: Value is the value of HTTP
-                                              Header to be matched.
+                                            description: |-
+                                              Value is the value of HTTP Header to be matched.
+
+                                              Must consist of printable US-ASCII characters, optionally separated
+                                              by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
                                         required:
                                         - name
@@ -1144,10 +1177,14 @@ spec:
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
-                                            description: Value is the value of HTTP
-                                              Header to be matched.
+                                            description: |-
+                                              Value is the value of HTTP Header to be matched.
+
+                                              Must consist of printable US-ASCII characters, optionally separated
+                                              by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
                                         required:
                                         - name
@@ -1458,6 +1495,9 @@ spec:
                                       enum:
                                       - 301
                                       - 302
+                                      - 303
+                                      - 307
+                                      - 308
                                       type: integer
                                   type: object
                                 responseHeaderModifier:
@@ -1505,10 +1545,14 @@ spec:
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
-                                            description: Value is the value of HTTP
-                                              Header to be matched.
+                                            description: |-
+                                              Value is the value of HTTP Header to be matched.
+
+                                              Must consist of printable US-ASCII characters, optionally separated
+                                              by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
                                         required:
                                         - name
@@ -1580,10 +1624,14 @@ spec:
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
-                                            description: Value is the value of HTTP
-                                              Header to be matched.
+                                            description: |-
+                                              Value is the value of HTTP Header to be matched.
+
+                                              Must consist of printable US-ASCII characters, optionally separated
+                                              by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
                                         required:
                                         - name
@@ -1727,6 +1775,11 @@ spec:
                               - type
                               type: object
                               x-kubernetes-validations:
+                              - message: filter.cors must be nil if the filter.type
+                                  is not CORS
+                                rule: '!(has(self.cors) && self.type != ''CORS'')'
+                              - message: filter.cors must be specified for CORS filter.type
+                                rule: '!(!has(self.cors) && self.type == ''CORS'')'
                               - message: filter.requestHeaderModifier must be nil
                                   if the filter.type is not RequestHeaderModifier
                                 rule: '!(has(self.requestHeaderModifier) && self.type
@@ -1770,11 +1823,6 @@ spec:
                               - message: filter.extensionRef must be specified for
                                   ExtensionRef filter.type
                                 rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
-                              - message: filter.cors must be nil if the filter.type
-                                  is not CORS
-                                rule: '!(has(self.cors) && self.type != ''CORS'')'
-                              - message: filter.cors must be specified for CORS filter.type
-                                rule: '!(!has(self.cors) && self.type == ''CORS'')'
                               - message: filter.externalAuth must be nil if the filter.type
                                   is not ExternalAuth
                                 rule: '!(has(self.externalAuth) && self.type != ''ExternalAuth'')'
@@ -1789,6 +1837,8 @@ spec:
                                 or httpRouteFilterRequestRewrite, but not both
                               rule: '!(self.exists(f, f.type == ''RequestRedirect'')
                                 && self.exists(f, f.type == ''URLRewrite''))'
+                            - message: CORS filter cannot be repeated
+                              rule: self.filter(f, f.type == 'CORS').size() <= 1
                             - message: RequestHeaderModifier filter cannot be repeated
                               rule: self.filter(f, f.type == 'RequestHeaderModifier').size()
                                 <= 1
@@ -1964,7 +2014,7 @@ spec:
                                   AllowHeaders indicates which HTTP request headers are supported for
                                   accessing the requested resource.
 
-                                  Header names are not case sensitive.
+                                  Header names are not case-sensitive.
 
                                   Multiple header names in the value of the `Access-Control-Allow-Headers`
                                   response header are separated by a comma (",").
@@ -1983,18 +2033,21 @@ spec:
                                   client side.
 
                                   A wildcard indicates that the requests with all HTTP headers are allowed.
-                                  The `Access-Control-Allow-Headers` response header can only use `*`
-                                  wildcard as value when the `AllowCredentials` field is false or omitted.
+                                  If config contains the wildcard "*" in allowHeaders and the request is
+                                  not credentialed, the `Access-Control-Allow-Headers` response header
+                                  can either use the `*` wildcard or the value of
+                                  Access-Control-Request-Headers from the request.
 
-                                  When the `AllowCredentials` field is true and `AllowHeaders` field
-                                  specified with the `*` wildcard, the gateway must specify one or more
+                                  When the request is credentialed, the gateway must not specify the `*`
+                                  wildcard in the `Access-Control-Allow-Headers` response header. When
+                                  also the `AllowCredentials` field is true and `AllowHeaders` field
+                                  is specified with the `*` wildcard, the gateway must specify one or more
                                   HTTP headers in the value of the `Access-Control-Allow-Headers` response
                                   header. The value of the header `Access-Control-Allow-Headers` is same as
                                   the `Access-Control-Request-Headers` header provided by the client. If
                                   the header `Access-Control-Request-Headers` is not included in the
                                   request, the gateway will omit the `Access-Control-Allow-Headers`
-                                  response header, instead of specifying the `*` wildcard. A Gateway
-                                  implementation may choose to add implementation-specific default headers.
+                                  response header, instead of specifying the `*` wildcard.
 
                                   Support: Extended
                                 items:
@@ -2018,6 +2071,10 @@ spec:
                                 maxItems: 64
                                 type: array
                                 x-kubernetes-list-type: set
+                                x-kubernetes-validations:
+                                - message: AllowHeaders cannot contain '*' alongside
+                                    other methods
+                                  rule: '!(''*'' in self && self.size() > 1)'
                               allowMethods:
                                 description: |-
                                   AllowMethods indicates which HTTP methods are supported for accessing the
@@ -2026,7 +2083,7 @@ spec:
                                   Valid values are any method defined by RFC9110, along with the special
                                   value `*`, which represents all HTTP methods are allowed.
 
-                                  Method names are case sensitive, so these values are also case-sensitive.
+                                  Method names are case-sensitive, so these values are also case-sensitive.
                                   (See https://www.rfc-editor.org/rfc/rfc2616#section-5.1.1)
 
                                   Multiple method names in the value of the `Access-Control-Allow-Methods`
@@ -2046,18 +2103,21 @@ spec:
                                   `Access-Control-Allow-Methods`, it will present an error on the client
                                   side.
 
-                                  The `Access-Control-Allow-Methods` response header can only use `*`
-                                  wildcard as value when the `AllowCredentials` field is false or omitted.
+                                  If config contains the wildcard "*" in allowMethods and the request is
+                                  not credentialed, the `Access-Control-Allow-Methods` response header
+                                  can either use the `*` wildcard or the value of
+                                  Access-Control-Request-Method from the request.
 
-                                  When the `AllowCredentials` field is true and `AllowMethods` field
+                                  When the request is credentialed, the gateway must not specify the `*`
+                                  wildcard in the `Access-Control-Allow-Methods` response header. When
+                                  also the `AllowCredentials` field is true and `AllowMethods` field
                                   specified with the `*` wildcard, the gateway must specify one HTTP method
                                   in the value of the Access-Control-Allow-Methods response header. The
                                   value of the header `Access-Control-Allow-Methods` is same as the
                                   `Access-Control-Request-Method` header provided by the client. If the
                                   header `Access-Control-Request-Method` is not included in the request,
                                   the gateway will omit the `Access-Control-Allow-Methods` response header,
-                                  instead of specifying the `*` wildcard. A Gateway implementation may
-                                  choose to add implementation-specific default methods.
+                                  instead of specifying the `*` wildcard.
 
                                   Support: Extended
                                 items:
@@ -2124,10 +2184,19 @@ spec:
                                   the CORS headers. The cross-origin request fails on the client side.
                                   Therefore, the client doesn't attempt the actual cross-origin request.
 
-                                  The `Access-Control-Allow-Origin` response header can only use `*`
-                                  wildcard as value when the `AllowCredentials` field is false or omitted.
+                                  Conversely, if the request `Origin` matches one of the configured
+                                  allowed origins, the gateway sets the response header
+                                  `Access-Control-Allow-Origin` to the same value as the `Origin`
+                                  header provided by the client.
 
-                                  When the `AllowCredentials` field is true and `AllowOrigins` field
+                                  When config has the wildcard ("*") in allowOrigins, and the request
+                                  is not credentialed (e.g., it is a preflight request), the
+                                  `Access-Control-Allow-Origin` response header either contains the
+                                  wildcard as well or the Origin from the request.
+
+                                  When the request is credentialed, the gateway must not specify the `*`
+                                  wildcard in the `Access-Control-Allow-Origin` response header. When
+                                  also the `AllowCredentials` field is true and `AllowOrigins` field
                                   specified with the `*` wildcard, the gateway must return a single origin
                                   in the value of the `Access-Control-Allow-Origin` response header,
                                   instead of specifying the `*` wildcard. The value of the header
@@ -2139,12 +2208,12 @@ spec:
                                   description: |-
                                     The CORSOrigin MUST NOT be a relative URI, and it MUST follow the URI syntax and
                                     encoding rules specified in RFC3986.  The CORSOrigin MUST include both a
-                                    scheme (e.g., "http" or "spiffe") and a scheme-specific-part, or it should be a single '*' character.
+                                    scheme ("http" or "https") and a scheme-specific-part, or it should be a single '*' character.
                                     URIs that include an authority MUST include a fully qualified domain name or
                                     IP address as the host.
                                   maxLength: 253
                                   minLength: 1
-                                  pattern: (^\*$)|(^([a-zA-Z][a-zA-Z0-9+\-.]+):\/\/([^:/?#]+)(:([0-9]{1,5}))?$)
+                                  pattern: (^\*$)|(^(http(s)?):\/\/(((\*\.)?([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9-]+|\*)(:([0-9]{1,5}))?)$)
                                   type: string
                                 maxItems: 64
                                 type: array
@@ -2175,14 +2244,18 @@ spec:
                                   this additional header will be exposed as part of the response to the
                                   client.
 
-                                  Header names are not case sensitive.
+                                  Header names are not case-sensitive.
 
                                   Multiple header names in the value of the `Access-Control-Expose-Headers`
                                   response header are separated by a comma (",").
 
                                   A wildcard indicates that the responses with all HTTP headers are exposed
                                   to clients. The `Access-Control-Expose-Headers` response header can only
-                                  use `*` wildcard as value when the `AllowCredentials` field is false or omitted.
+                                  use `*` wildcard as value when the request is not credentialed.
+
+                                  When the `exposeHeaders` config field contains the "*" wildcard and
+                                  the request is credentialed, the gateway cannot use the `*` wildcard in
+                                  the `Access-Control-Expose-Headers` response header.
 
                                   Support: Extended
                                 items:
@@ -2218,6 +2291,9 @@ spec:
 
                                   The default value of `Access-Control-Max-Age` response header is 5
                                   (seconds).
+
+                                  When the `MaxAge` field is unspecified, the gateway sets the response
+                                  header "Access-Control-Max-Age: 5" by default.
                                 format: int32
                                 minimum: 1
                                 type: integer
@@ -2396,6 +2472,7 @@ spec:
                                       If the list has entries, only those entries must be sent.
                                     items:
                                       type: string
+                                    maxItems: 64
                                     type: array
                                     x-kubernetes-list-type: set
                                 type: object
@@ -2434,6 +2511,7 @@ spec:
                                       request must be set to the actual number of bytes forwarded.
                                     items:
                                       type: string
+                                    maxItems: 64
                                     type: array
                                     x-kubernetes-list-type: set
                                   allowedResponseHeaders:
@@ -2445,6 +2523,7 @@ spec:
                                       except Authority or Host must be copied.
                                     items:
                                       type: string
+                                    maxItems: 64
                                     type: array
                                     x-kubernetes-list-type: set
                                   path:
@@ -2546,10 +2625,14 @@ spec:
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: |-
+                                        Value is the value of HTTP Header to be matched.
+
+                                        Must consist of printable US-ASCII characters, optionally separated
+                                        by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
                                   required:
                                   - name
@@ -2620,10 +2703,14 @@ spec:
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: |-
+                                        Value is the value of HTTP Header to be matched.
+
+                                        Must consist of printable US-ASCII characters, optionally separated
+                                        by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
                                   required:
                                   - name
@@ -2934,6 +3021,9 @@ spec:
                                 enum:
                                 - 301
                                 - 302
+                                - 303
+                                - 307
+                                - 308
                                 type: integer
                             type: object
                           responseHeaderModifier:
@@ -2980,10 +3070,14 @@ spec:
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: |-
+                                        Value is the value of HTTP Header to be matched.
+
+                                        Must consist of printable US-ASCII characters, optionally separated
+                                        by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
                                   required:
                                   - name
@@ -3054,10 +3148,14 @@ spec:
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: |-
+                                        Value is the value of HTTP Header to be matched.
+
+                                        Must consist of printable US-ASCII characters, optionally separated
+                                        by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
                                   required:
                                   - name
@@ -3201,6 +3299,11 @@ spec:
                         - type
                         type: object
                         x-kubernetes-validations:
+                        - message: filter.cors must be nil if the filter.type is not
+                            CORS
+                          rule: '!(has(self.cors) && self.type != ''CORS'')'
+                        - message: filter.cors must be specified for CORS filter.type
+                          rule: '!(!has(self.cors) && self.type == ''CORS'')'
                         - message: filter.requestHeaderModifier must be nil if the
                             filter.type is not RequestHeaderModifier
                           rule: '!(has(self.requestHeaderModifier) && self.type !=
@@ -3241,11 +3344,6 @@ spec:
                         - message: filter.extensionRef must be specified for ExtensionRef
                             filter.type
                           rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
-                        - message: filter.cors must be nil if the filter.type is not
-                            CORS
-                          rule: '!(has(self.cors) && self.type != ''CORS'')'
-                        - message: filter.cors must be specified for CORS filter.type
-                          rule: '!(!has(self.cors) && self.type == ''CORS'')'
                         - message: filter.externalAuth must be nil if the filter.type
                             is not ExternalAuth
                           rule: '!(has(self.externalAuth) && self.type != ''ExternalAuth'')'
@@ -3260,6 +3358,8 @@ spec:
                           or httpRouteFilterRequestRewrite, but not both
                         rule: '!(self.exists(f, f.type == ''RequestRedirect'') &&
                           self.exists(f, f.type == ''URLRewrite''))'
+                      - message: CORS filter cannot be repeated
+                        rule: self.filter(f, f.type == 'CORS').size() <= 1
                       - message: RequestHeaderModifier filter cannot be repeated
                         rule: self.filter(f, f.type == 'RequestHeaderModifier').size()
                           <= 1
@@ -3391,10 +3491,14 @@ spec:
                                   - RegularExpression
                                   type: string
                                 value:
-                                  description: Value is the value of HTTP Header to
-                                    be matched.
+                                  description: |-
+                                    Value is the value of HTTP Header to be matched.
+
+                                    Must consist of printable US-ASCII characters, optionally separated
+                                    by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                   maxLength: 4096
                                   minLength: 1
+                                  pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                   type: string
                               required:
                               - name
@@ -3603,7 +3707,7 @@ spec:
                             For example, setting the `rules[].retry.backoff` field to the value
                             `100ms` will cause a backend request to first be retried approximately
                             100 milliseconds after timing out or receiving a response code configured
-                            to be retryable.
+                            to be retriable.
 
                             An implementation MAY use an exponential or alternative backoff strategy
                             for subsequent retry attempts, MAY cap the maximum backoff duration to
@@ -3646,7 +3750,7 @@ spec:
                               HTTPRouteRetryStatusCode defines an HTTP response status code for
                               which a backend request should be retried.
 
-                              Implementations MUST support the following status codes as retryable:
+                              Implementations MUST support the following status codes as retriable:
 
                               * 500
                               * 502
@@ -3737,7 +3841,7 @@ spec:
                           default: Cookie
                           description: |-
                             Type defines the type of session persistence such as through
-                            the use a header or cookie. Defaults to cookie based session
+                            the use of a header or cookie. Defaults to cookie based session
                             persistence.
 
                             Support: Core for "Cookie" type
@@ -3753,6 +3857,8 @@ spec:
                           is Permanent
                         rule: '!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType)
                           || self.cookieConfig.lifetimeType != ''Permanent'' || has(self.absoluteTimeout)'
+                      - message: cookieConfig can only be set with type Cookie
+                        rule: '!has(self.cookieConfig) || self.type == ''Cookie'''
                     timeouts:
                       description: |-
                         Timeouts defines the timeouts that can be configured for an HTTP request.
@@ -3857,6 +3963,7 @@ spec:
                       != 1 || !has(self.matches[0].path) || self.matches[0].path.type
                       != ''PathPrefix'') ? false : true) : true'
                 maxItems: 16
+                minItems: 1
                 type: array
                 x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
@@ -3940,7 +4047,7 @@ spec:
 
                         * The Route refers to a nonexistent parent.
                         * The Route is of a type that the controller does not support.
-                        * The Route is in a namespace the controller does not have access to.
+                        * The Route is in a namespace to which the controller does not have access.
                       items:
                         description: Condition contains details for one aspect of
                           the current state of this API Resource.
@@ -4642,7 +4749,7 @@ spec:
                                         AllowHeaders indicates which HTTP request headers are supported for
                                         accessing the requested resource.
 
-                                        Header names are not case sensitive.
+                                        Header names are not case-sensitive.
 
                                         Multiple header names in the value of the `Access-Control-Allow-Headers`
                                         response header are separated by a comma (",").
@@ -4661,18 +4768,21 @@ spec:
                                         client side.
 
                                         A wildcard indicates that the requests with all HTTP headers are allowed.
-                                        The `Access-Control-Allow-Headers` response header can only use `*`
-                                        wildcard as value when the `AllowCredentials` field is false or omitted.
+                                        If config contains the wildcard "*" in allowHeaders and the request is
+                                        not credentialed, the `Access-Control-Allow-Headers` response header
+                                        can either use the `*` wildcard or the value of
+                                        Access-Control-Request-Headers from the request.
 
-                                        When the `AllowCredentials` field is true and `AllowHeaders` field
-                                        specified with the `*` wildcard, the gateway must specify one or more
+                                        When the request is credentialed, the gateway must not specify the `*`
+                                        wildcard in the `Access-Control-Allow-Headers` response header. When
+                                        also the `AllowCredentials` field is true and `AllowHeaders` field
+                                        is specified with the `*` wildcard, the gateway must specify one or more
                                         HTTP headers in the value of the `Access-Control-Allow-Headers` response
                                         header. The value of the header `Access-Control-Allow-Headers` is same as
                                         the `Access-Control-Request-Headers` header provided by the client. If
                                         the header `Access-Control-Request-Headers` is not included in the
                                         request, the gateway will omit the `Access-Control-Allow-Headers`
-                                        response header, instead of specifying the `*` wildcard. A Gateway
-                                        implementation may choose to add implementation-specific default headers.
+                                        response header, instead of specifying the `*` wildcard.
 
                                         Support: Extended
                                       items:
@@ -4696,6 +4806,10 @@ spec:
                                       maxItems: 64
                                       type: array
                                       x-kubernetes-list-type: set
+                                      x-kubernetes-validations:
+                                      - message: AllowHeaders cannot contain '*' alongside
+                                          other methods
+                                        rule: '!(''*'' in self && self.size() > 1)'
                                     allowMethods:
                                       description: |-
                                         AllowMethods indicates which HTTP methods are supported for accessing the
@@ -4704,7 +4818,7 @@ spec:
                                         Valid values are any method defined by RFC9110, along with the special
                                         value `*`, which represents all HTTP methods are allowed.
 
-                                        Method names are case sensitive, so these values are also case-sensitive.
+                                        Method names are case-sensitive, so these values are also case-sensitive.
                                         (See https://www.rfc-editor.org/rfc/rfc2616#section-5.1.1)
 
                                         Multiple method names in the value of the `Access-Control-Allow-Methods`
@@ -4724,18 +4838,21 @@ spec:
                                         `Access-Control-Allow-Methods`, it will present an error on the client
                                         side.
 
-                                        The `Access-Control-Allow-Methods` response header can only use `*`
-                                        wildcard as value when the `AllowCredentials` field is false or omitted.
+                                        If config contains the wildcard "*" in allowMethods and the request is
+                                        not credentialed, the `Access-Control-Allow-Methods` response header
+                                        can either use the `*` wildcard or the value of
+                                        Access-Control-Request-Method from the request.
 
-                                        When the `AllowCredentials` field is true and `AllowMethods` field
+                                        When the request is credentialed, the gateway must not specify the `*`
+                                        wildcard in the `Access-Control-Allow-Methods` response header. When
+                                        also the `AllowCredentials` field is true and `AllowMethods` field
                                         specified with the `*` wildcard, the gateway must specify one HTTP method
                                         in the value of the Access-Control-Allow-Methods response header. The
                                         value of the header `Access-Control-Allow-Methods` is same as the
                                         `Access-Control-Request-Method` header provided by the client. If the
                                         header `Access-Control-Request-Method` is not included in the request,
                                         the gateway will omit the `Access-Control-Allow-Methods` response header,
-                                        instead of specifying the `*` wildcard. A Gateway implementation may
-                                        choose to add implementation-specific default methods.
+                                        instead of specifying the `*` wildcard.
 
                                         Support: Extended
                                       items:
@@ -4802,10 +4919,19 @@ spec:
                                         the CORS headers. The cross-origin request fails on the client side.
                                         Therefore, the client doesn't attempt the actual cross-origin request.
 
-                                        The `Access-Control-Allow-Origin` response header can only use `*`
-                                        wildcard as value when the `AllowCredentials` field is false or omitted.
+                                        Conversely, if the request `Origin` matches one of the configured
+                                        allowed origins, the gateway sets the response header
+                                        `Access-Control-Allow-Origin` to the same value as the `Origin`
+                                        header provided by the client.
 
-                                        When the `AllowCredentials` field is true and `AllowOrigins` field
+                                        When config has the wildcard ("*") in allowOrigins, and the request
+                                        is not credentialed (e.g., it is a preflight request), the
+                                        `Access-Control-Allow-Origin` response header either contains the
+                                        wildcard as well or the Origin from the request.
+
+                                        When the request is credentialed, the gateway must not specify the `*`
+                                        wildcard in the `Access-Control-Allow-Origin` response header. When
+                                        also the `AllowCredentials` field is true and `AllowOrigins` field
                                         specified with the `*` wildcard, the gateway must return a single origin
                                         in the value of the `Access-Control-Allow-Origin` response header,
                                         instead of specifying the `*` wildcard. The value of the header
@@ -4817,12 +4943,12 @@ spec:
                                         description: |-
                                           The CORSOrigin MUST NOT be a relative URI, and it MUST follow the URI syntax and
                                           encoding rules specified in RFC3986.  The CORSOrigin MUST include both a
-                                          scheme (e.g., "http" or "spiffe") and a scheme-specific-part, or it should be a single '*' character.
+                                          scheme ("http" or "https") and a scheme-specific-part, or it should be a single '*' character.
                                           URIs that include an authority MUST include a fully qualified domain name or
                                           IP address as the host.
                                         maxLength: 253
                                         minLength: 1
-                                        pattern: (^\*$)|(^([a-zA-Z][a-zA-Z0-9+\-.]+):\/\/([^:/?#]+)(:([0-9]{1,5}))?$)
+                                        pattern: (^\*$)|(^(http(s)?):\/\/(((\*\.)?([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9-]+|\*)(:([0-9]{1,5}))?)$)
                                         type: string
                                       maxItems: 64
                                       type: array
@@ -4853,14 +4979,18 @@ spec:
                                         this additional header will be exposed as part of the response to the
                                         client.
 
-                                        Header names are not case sensitive.
+                                        Header names are not case-sensitive.
 
                                         Multiple header names in the value of the `Access-Control-Expose-Headers`
                                         response header are separated by a comma (",").
 
                                         A wildcard indicates that the responses with all HTTP headers are exposed
                                         to clients. The `Access-Control-Expose-Headers` response header can only
-                                        use `*` wildcard as value when the `AllowCredentials` field is false or omitted.
+                                        use `*` wildcard as value when the request is not credentialed.
+
+                                        When the `exposeHeaders` config field contains the "*" wildcard and
+                                        the request is credentialed, the gateway cannot use the `*` wildcard in
+                                        the `Access-Control-Expose-Headers` response header.
 
                                         Support: Extended
                                       items:
@@ -4896,6 +5026,9 @@ spec:
 
                                         The default value of `Access-Control-Max-Age` response header is 5
                                         (seconds).
+
+                                        When the `MaxAge` field is unspecified, the gateway sets the response
+                                        header "Access-Control-Max-Age: 5" by default.
                                       format: int32
                                       minimum: 1
                                       type: integer
@@ -5074,6 +5207,7 @@ spec:
                                             If the list has entries, only those entries must be sent.
                                           items:
                                             type: string
+                                          maxItems: 64
                                           type: array
                                           x-kubernetes-list-type: set
                                       type: object
@@ -5112,6 +5246,7 @@ spec:
                                             request must be set to the actual number of bytes forwarded.
                                           items:
                                             type: string
+                                          maxItems: 64
                                           type: array
                                           x-kubernetes-list-type: set
                                         allowedResponseHeaders:
@@ -5123,6 +5258,7 @@ spec:
                                             except Authority or Host must be copied.
                                           items:
                                             type: string
+                                          maxItems: 64
                                           type: array
                                           x-kubernetes-list-type: set
                                         path:
@@ -5227,10 +5363,14 @@ spec:
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
-                                            description: Value is the value of HTTP
-                                              Header to be matched.
+                                            description: |-
+                                              Value is the value of HTTP Header to be matched.
+
+                                              Must consist of printable US-ASCII characters, optionally separated
+                                              by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
                                         required:
                                         - name
@@ -5302,10 +5442,14 @@ spec:
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
-                                            description: Value is the value of HTTP
-                                              Header to be matched.
+                                            description: |-
+                                              Value is the value of HTTP Header to be matched.
+
+                                              Must consist of printable US-ASCII characters, optionally separated
+                                              by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
                                         required:
                                         - name
@@ -5616,6 +5760,9 @@ spec:
                                       enum:
                                       - 301
                                       - 302
+                                      - 303
+                                      - 307
+                                      - 308
                                       type: integer
                                   type: object
                                 responseHeaderModifier:
@@ -5663,10 +5810,14 @@ spec:
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
-                                            description: Value is the value of HTTP
-                                              Header to be matched.
+                                            description: |-
+                                              Value is the value of HTTP Header to be matched.
+
+                                              Must consist of printable US-ASCII characters, optionally separated
+                                              by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
                                         required:
                                         - name
@@ -5738,10 +5889,14 @@ spec:
                                             pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                             type: string
                                           value:
-                                            description: Value is the value of HTTP
-                                              Header to be matched.
+                                            description: |-
+                                              Value is the value of HTTP Header to be matched.
+
+                                              Must consist of printable US-ASCII characters, optionally separated
+                                              by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                             maxLength: 4096
                                             minLength: 1
+                                            pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                             type: string
                                         required:
                                         - name
@@ -5885,6 +6040,11 @@ spec:
                               - type
                               type: object
                               x-kubernetes-validations:
+                              - message: filter.cors must be nil if the filter.type
+                                  is not CORS
+                                rule: '!(has(self.cors) && self.type != ''CORS'')'
+                              - message: filter.cors must be specified for CORS filter.type
+                                rule: '!(!has(self.cors) && self.type == ''CORS'')'
                               - message: filter.requestHeaderModifier must be nil
                                   if the filter.type is not RequestHeaderModifier
                                 rule: '!(has(self.requestHeaderModifier) && self.type
@@ -5928,11 +6088,6 @@ spec:
                               - message: filter.extensionRef must be specified for
                                   ExtensionRef filter.type
                                 rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
-                              - message: filter.cors must be nil if the filter.type
-                                  is not CORS
-                                rule: '!(has(self.cors) && self.type != ''CORS'')'
-                              - message: filter.cors must be specified for CORS filter.type
-                                rule: '!(!has(self.cors) && self.type == ''CORS'')'
                               - message: filter.externalAuth must be nil if the filter.type
                                   is not ExternalAuth
                                 rule: '!(has(self.externalAuth) && self.type != ''ExternalAuth'')'
@@ -5947,6 +6102,8 @@ spec:
                                 or httpRouteFilterRequestRewrite, but not both
                               rule: '!(self.exists(f, f.type == ''RequestRedirect'')
                                 && self.exists(f, f.type == ''URLRewrite''))'
+                            - message: CORS filter cannot be repeated
+                              rule: self.filter(f, f.type == 'CORS').size() <= 1
                             - message: RequestHeaderModifier filter cannot be repeated
                               rule: self.filter(f, f.type == 'RequestHeaderModifier').size()
                                 <= 1
@@ -6122,7 +6279,7 @@ spec:
                                   AllowHeaders indicates which HTTP request headers are supported for
                                   accessing the requested resource.
 
-                                  Header names are not case sensitive.
+                                  Header names are not case-sensitive.
 
                                   Multiple header names in the value of the `Access-Control-Allow-Headers`
                                   response header are separated by a comma (",").
@@ -6141,18 +6298,21 @@ spec:
                                   client side.
 
                                   A wildcard indicates that the requests with all HTTP headers are allowed.
-                                  The `Access-Control-Allow-Headers` response header can only use `*`
-                                  wildcard as value when the `AllowCredentials` field is false or omitted.
+                                  If config contains the wildcard "*" in allowHeaders and the request is
+                                  not credentialed, the `Access-Control-Allow-Headers` response header
+                                  can either use the `*` wildcard or the value of
+                                  Access-Control-Request-Headers from the request.
 
-                                  When the `AllowCredentials` field is true and `AllowHeaders` field
-                                  specified with the `*` wildcard, the gateway must specify one or more
+                                  When the request is credentialed, the gateway must not specify the `*`
+                                  wildcard in the `Access-Control-Allow-Headers` response header. When
+                                  also the `AllowCredentials` field is true and `AllowHeaders` field
+                                  is specified with the `*` wildcard, the gateway must specify one or more
                                   HTTP headers in the value of the `Access-Control-Allow-Headers` response
                                   header. The value of the header `Access-Control-Allow-Headers` is same as
                                   the `Access-Control-Request-Headers` header provided by the client. If
                                   the header `Access-Control-Request-Headers` is not included in the
                                   request, the gateway will omit the `Access-Control-Allow-Headers`
-                                  response header, instead of specifying the `*` wildcard. A Gateway
-                                  implementation may choose to add implementation-specific default headers.
+                                  response header, instead of specifying the `*` wildcard.
 
                                   Support: Extended
                                 items:
@@ -6176,6 +6336,10 @@ spec:
                                 maxItems: 64
                                 type: array
                                 x-kubernetes-list-type: set
+                                x-kubernetes-validations:
+                                - message: AllowHeaders cannot contain '*' alongside
+                                    other methods
+                                  rule: '!(''*'' in self && self.size() > 1)'
                               allowMethods:
                                 description: |-
                                   AllowMethods indicates which HTTP methods are supported for accessing the
@@ -6184,7 +6348,7 @@ spec:
                                   Valid values are any method defined by RFC9110, along with the special
                                   value `*`, which represents all HTTP methods are allowed.
 
-                                  Method names are case sensitive, so these values are also case-sensitive.
+                                  Method names are case-sensitive, so these values are also case-sensitive.
                                   (See https://www.rfc-editor.org/rfc/rfc2616#section-5.1.1)
 
                                   Multiple method names in the value of the `Access-Control-Allow-Methods`
@@ -6204,18 +6368,21 @@ spec:
                                   `Access-Control-Allow-Methods`, it will present an error on the client
                                   side.
 
-                                  The `Access-Control-Allow-Methods` response header can only use `*`
-                                  wildcard as value when the `AllowCredentials` field is false or omitted.
+                                  If config contains the wildcard "*" in allowMethods and the request is
+                                  not credentialed, the `Access-Control-Allow-Methods` response header
+                                  can either use the `*` wildcard or the value of
+                                  Access-Control-Request-Method from the request.
 
-                                  When the `AllowCredentials` field is true and `AllowMethods` field
+                                  When the request is credentialed, the gateway must not specify the `*`
+                                  wildcard in the `Access-Control-Allow-Methods` response header. When
+                                  also the `AllowCredentials` field is true and `AllowMethods` field
                                   specified with the `*` wildcard, the gateway must specify one HTTP method
                                   in the value of the Access-Control-Allow-Methods response header. The
                                   value of the header `Access-Control-Allow-Methods` is same as the
                                   `Access-Control-Request-Method` header provided by the client. If the
                                   header `Access-Control-Request-Method` is not included in the request,
                                   the gateway will omit the `Access-Control-Allow-Methods` response header,
-                                  instead of specifying the `*` wildcard. A Gateway implementation may
-                                  choose to add implementation-specific default methods.
+                                  instead of specifying the `*` wildcard.
 
                                   Support: Extended
                                 items:
@@ -6282,10 +6449,19 @@ spec:
                                   the CORS headers. The cross-origin request fails on the client side.
                                   Therefore, the client doesn't attempt the actual cross-origin request.
 
-                                  The `Access-Control-Allow-Origin` response header can only use `*`
-                                  wildcard as value when the `AllowCredentials` field is false or omitted.
+                                  Conversely, if the request `Origin` matches one of the configured
+                                  allowed origins, the gateway sets the response header
+                                  `Access-Control-Allow-Origin` to the same value as the `Origin`
+                                  header provided by the client.
 
-                                  When the `AllowCredentials` field is true and `AllowOrigins` field
+                                  When config has the wildcard ("*") in allowOrigins, and the request
+                                  is not credentialed (e.g., it is a preflight request), the
+                                  `Access-Control-Allow-Origin` response header either contains the
+                                  wildcard as well or the Origin from the request.
+
+                                  When the request is credentialed, the gateway must not specify the `*`
+                                  wildcard in the `Access-Control-Allow-Origin` response header. When
+                                  also the `AllowCredentials` field is true and `AllowOrigins` field
                                   specified with the `*` wildcard, the gateway must return a single origin
                                   in the value of the `Access-Control-Allow-Origin` response header,
                                   instead of specifying the `*` wildcard. The value of the header
@@ -6297,12 +6473,12 @@ spec:
                                   description: |-
                                     The CORSOrigin MUST NOT be a relative URI, and it MUST follow the URI syntax and
                                     encoding rules specified in RFC3986.  The CORSOrigin MUST include both a
-                                    scheme (e.g., "http" or "spiffe") and a scheme-specific-part, or it should be a single '*' character.
+                                    scheme ("http" or "https") and a scheme-specific-part, or it should be a single '*' character.
                                     URIs that include an authority MUST include a fully qualified domain name or
                                     IP address as the host.
                                   maxLength: 253
                                   minLength: 1
-                                  pattern: (^\*$)|(^([a-zA-Z][a-zA-Z0-9+\-.]+):\/\/([^:/?#]+)(:([0-9]{1,5}))?$)
+                                  pattern: (^\*$)|(^(http(s)?):\/\/(((\*\.)?([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9-]+|\*)(:([0-9]{1,5}))?)$)
                                   type: string
                                 maxItems: 64
                                 type: array
@@ -6333,14 +6509,18 @@ spec:
                                   this additional header will be exposed as part of the response to the
                                   client.
 
-                                  Header names are not case sensitive.
+                                  Header names are not case-sensitive.
 
                                   Multiple header names in the value of the `Access-Control-Expose-Headers`
                                   response header are separated by a comma (",").
 
                                   A wildcard indicates that the responses with all HTTP headers are exposed
                                   to clients. The `Access-Control-Expose-Headers` response header can only
-                                  use `*` wildcard as value when the `AllowCredentials` field is false or omitted.
+                                  use `*` wildcard as value when the request is not credentialed.
+
+                                  When the `exposeHeaders` config field contains the "*" wildcard and
+                                  the request is credentialed, the gateway cannot use the `*` wildcard in
+                                  the `Access-Control-Expose-Headers` response header.
 
                                   Support: Extended
                                 items:
@@ -6376,6 +6556,9 @@ spec:
 
                                   The default value of `Access-Control-Max-Age` response header is 5
                                   (seconds).
+
+                                  When the `MaxAge` field is unspecified, the gateway sets the response
+                                  header "Access-Control-Max-Age: 5" by default.
                                 format: int32
                                 minimum: 1
                                 type: integer
@@ -6554,6 +6737,7 @@ spec:
                                       If the list has entries, only those entries must be sent.
                                     items:
                                       type: string
+                                    maxItems: 64
                                     type: array
                                     x-kubernetes-list-type: set
                                 type: object
@@ -6592,6 +6776,7 @@ spec:
                                       request must be set to the actual number of bytes forwarded.
                                     items:
                                       type: string
+                                    maxItems: 64
                                     type: array
                                     x-kubernetes-list-type: set
                                   allowedResponseHeaders:
@@ -6603,6 +6788,7 @@ spec:
                                       except Authority or Host must be copied.
                                     items:
                                       type: string
+                                    maxItems: 64
                                     type: array
                                     x-kubernetes-list-type: set
                                   path:
@@ -6704,10 +6890,14 @@ spec:
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: |-
+                                        Value is the value of HTTP Header to be matched.
+
+                                        Must consist of printable US-ASCII characters, optionally separated
+                                        by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
                                   required:
                                   - name
@@ -6778,10 +6968,14 @@ spec:
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: |-
+                                        Value is the value of HTTP Header to be matched.
+
+                                        Must consist of printable US-ASCII characters, optionally separated
+                                        by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
                                   required:
                                   - name
@@ -7092,6 +7286,9 @@ spec:
                                 enum:
                                 - 301
                                 - 302
+                                - 303
+                                - 307
+                                - 308
                                 type: integer
                             type: object
                           responseHeaderModifier:
@@ -7138,10 +7335,14 @@ spec:
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: |-
+                                        Value is the value of HTTP Header to be matched.
+
+                                        Must consist of printable US-ASCII characters, optionally separated
+                                        by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
                                   required:
                                   - name
@@ -7212,10 +7413,14 @@ spec:
                                       pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                       type: string
                                     value:
-                                      description: Value is the value of HTTP Header
-                                        to be matched.
+                                      description: |-
+                                        Value is the value of HTTP Header to be matched.
+
+                                        Must consist of printable US-ASCII characters, optionally separated
+                                        by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                       maxLength: 4096
                                       minLength: 1
+                                      pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                       type: string
                                   required:
                                   - name
@@ -7359,6 +7564,11 @@ spec:
                         - type
                         type: object
                         x-kubernetes-validations:
+                        - message: filter.cors must be nil if the filter.type is not
+                            CORS
+                          rule: '!(has(self.cors) && self.type != ''CORS'')'
+                        - message: filter.cors must be specified for CORS filter.type
+                          rule: '!(!has(self.cors) && self.type == ''CORS'')'
                         - message: filter.requestHeaderModifier must be nil if the
                             filter.type is not RequestHeaderModifier
                           rule: '!(has(self.requestHeaderModifier) && self.type !=
@@ -7399,11 +7609,6 @@ spec:
                         - message: filter.extensionRef must be specified for ExtensionRef
                             filter.type
                           rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
-                        - message: filter.cors must be nil if the filter.type is not
-                            CORS
-                          rule: '!(has(self.cors) && self.type != ''CORS'')'
-                        - message: filter.cors must be specified for CORS filter.type
-                          rule: '!(!has(self.cors) && self.type == ''CORS'')'
                         - message: filter.externalAuth must be nil if the filter.type
                             is not ExternalAuth
                           rule: '!(has(self.externalAuth) && self.type != ''ExternalAuth'')'
@@ -7418,6 +7623,8 @@ spec:
                           or httpRouteFilterRequestRewrite, but not both
                         rule: '!(self.exists(f, f.type == ''RequestRedirect'') &&
                           self.exists(f, f.type == ''URLRewrite''))'
+                      - message: CORS filter cannot be repeated
+                        rule: self.filter(f, f.type == 'CORS').size() <= 1
                       - message: RequestHeaderModifier filter cannot be repeated
                         rule: self.filter(f, f.type == 'RequestHeaderModifier').size()
                           <= 1
@@ -7549,10 +7756,14 @@ spec:
                                   - RegularExpression
                                   type: string
                                 value:
-                                  description: Value is the value of HTTP Header to
-                                    be matched.
+                                  description: |-
+                                    Value is the value of HTTP Header to be matched.
+
+                                    Must consist of printable US-ASCII characters, optionally separated
+                                    by single tabs or spaces. See: https://tools.ietf.org/html/rfc7230#section-3.2
                                   maxLength: 4096
                                   minLength: 1
+                                  pattern: ^[!-~]+([\t ]?[!-~]+)*$
                                   type: string
                               required:
                               - name
@@ -7761,7 +7972,7 @@ spec:
                             For example, setting the `rules[].retry.backoff` field to the value
                             `100ms` will cause a backend request to first be retried approximately
                             100 milliseconds after timing out or receiving a response code configured
-                            to be retryable.
+                            to be retriable.
 
                             An implementation MAY use an exponential or alternative backoff strategy
                             for subsequent retry attempts, MAY cap the maximum backoff duration to
@@ -7804,7 +8015,7 @@ spec:
                               HTTPRouteRetryStatusCode defines an HTTP response status code for
                               which a backend request should be retried.
 
-                              Implementations MUST support the following status codes as retryable:
+                              Implementations MUST support the following status codes as retriable:
 
                               * 500
                               * 502
@@ -7895,7 +8106,7 @@ spec:
                           default: Cookie
                           description: |-
                             Type defines the type of session persistence such as through
-                            the use a header or cookie. Defaults to cookie based session
+                            the use of a header or cookie. Defaults to cookie based session
                             persistence.
 
                             Support: Core for "Cookie" type
@@ -7911,6 +8122,8 @@ spec:
                           is Permanent
                         rule: '!has(self.cookieConfig) || !has(self.cookieConfig.lifetimeType)
                           || self.cookieConfig.lifetimeType != ''Permanent'' || has(self.absoluteTimeout)'
+                      - message: cookieConfig can only be set with type Cookie
+                        rule: '!has(self.cookieConfig) || self.type == ''Cookie'''
                     timeouts:
                       description: |-
                         Timeouts defines the timeouts that can be configured for an HTTP request.
@@ -8015,6 +8228,7 @@ spec:
                       != 1 || !has(self.matches[0].path) || self.matches[0].path.type
                       != ''PathPrefix'') ? false : true) : true'
                 maxItems: 16
+                minItems: 1
                 type: array
                 x-kubernetes-list-type: atomic
                 x-kubernetes-validations:
@@ -8098,7 +8312,7 @@ spec:
 
                         * The Route refers to a nonexistent parent.
                         * The Route is of a type that the controller does not support.
-                        * The Route is in a namespace the controller does not have access to.
+                        * The Route is in a namespace to which the controller does not have access.
                       items:
                         description: Condition contains details for one aspect of
                           the current state of this API Resource.
@@ -8334,9 +8548,3 @@ spec:
     storage: false
     subresources:
       status: {}
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: null
-  storedVersions: null

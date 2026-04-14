@@ -9,4 +9,4 @@ releaseName: gateway-api-crds
 namespace: kube-system
 includeCRDs: true
 skipHooks: false
-version: 1.4.0
+version: 1.5.1
