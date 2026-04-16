@@ -8,8 +8,8 @@ metadata:
     app.kubernetes.io/instance: rook-ceph
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: ceph-csi
-    app.kubernetes.io/version: v0.5.0
-    helm.sh/chart: ceph-csi-operator-0.5.0
+    app.kubernetes.io/version: v0.6.0
+    helm.sh/chart: ceph-csi-operator-0.6.0
   name: operatorconfigs.csi.ceph.io
 spec:
   group: csi.ceph.io
