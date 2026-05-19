@@ -9,4 +9,4 @@ releaseName: kgateway
 namespace: kgateway-system
 includeCRDs: true
 skipHooks: false
-version: v2.2.3
+version: v2.3.0
