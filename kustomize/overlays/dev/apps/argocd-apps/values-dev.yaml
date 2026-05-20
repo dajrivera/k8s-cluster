@@ -18,6 +18,8 @@ argocdApplications:
     name: argocd
     namespace: argocd
     appCategory: apps
+    syncOptions:
+    - ServerSideApply=true
   talos:
     disableAutomated: false
     disable: false
