@@ -9,4 +9,4 @@ releaseName: argo-cd
 namespace: argocd
 includeCRDs: true
 skipHooks: false
-version: 9.0.5
+version: 9.5.14
